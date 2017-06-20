@@ -8,8 +8,8 @@ import InterestsScreen from './screens/Interests';
 
 
 const MainNavigator = TabNavigator({
-    register: { screen: RegisterScreen },
     interests: { screen: InterestsScreen },
+    register: { screen: RegisterScreen },
     welcome: { screen: WelcomeScreen },
     login: { screen: LoginScreen },
 
