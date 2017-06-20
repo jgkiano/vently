@@ -8,10 +8,11 @@ import InterestsScreen from './screens/Interests';
 
 
 const MainNavigator = TabNavigator({
+    register: { screen: RegisterScreen },
     interests: { screen: InterestsScreen },
     welcome: { screen: WelcomeScreen },
     login: { screen: LoginScreen },
-    register: { screen: RegisterScreen },
+
 }, {
     navigationOptions: {
         tabBarVisible: false
