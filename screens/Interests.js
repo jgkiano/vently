@@ -1,24 +1,25 @@
 import React, { Component } from 'react';
 import { View, Text, TouchableOpacity, Dimensions, ScrollView, Image, LayoutAnimation } from 'react-native';
-import { Item, Input, Label, Button, Picker } from 'native-base';
+import { Button } from 'native-base';
 
+//get screen width
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
-const ICON_DIR = '../assets/icons/interests/';
+//temporary icons
+const musicIcon         = require('../assets/icons/interests/music.png');
+const airplaneIcon      = require('../assets/icons/interests/airplane.png');
+const atomIcon          = require('../assets/icons/interests/atomic.png');
+const babyIcon          = require('../assets/icons/interests/baby.png');
+const charityIcon       = require('../assets/icons/interests/charity.png');
+const communityIcon     = require('../assets/icons/interests/community.png');
+const electionsIcon     = require('../assets/icons/interests/elections.png');
+const footballIcon      = require('../assets/icons/interests/football.png');
+const idIcon            = require('../assets/icons/interests/id.png');
+const movieIcon         = require('../assets/icons/interests/movie.png');
+const playIcon          = require('../assets/icons/interests/play.png');
+const prayIcon          = require('../assets/icons/interests/praying.png');
 
-const musicIcon     = require('../assets/icons/interests/music.png');
-const airplaneIcon  = require('../assets/icons/interests/airplane.png');
-const atomIcon  = require('../assets/icons/interests/atomic.png');
-const babyIcon  = require('../assets/icons/interests/baby.png');
-const charityIcon  = require('../assets/icons/interests/charity.png');
-const communityIcon  = require('../assets/icons/interests/community.png');
-const electionsIcon  = require('../assets/icons/interests/elections.png');
-const footballIcon  = require('../assets/icons/interests/football.png');
-const idIcon  = require('../assets/icons/interests/id.png');
-const movieIcon  = require('../assets/icons/interests/movie.png');
-const playIcon  = require('../assets/icons/interests/play.png');
-const prayIcon  = require('../assets/icons/interests/praying.png');
-
+//tenporary data
 const DATA = {
     interests: [
         {
@@ -85,25 +86,27 @@ const DATA = {
 };
 
 class Interests extends Component {
+
+    //nice spring animation
     componentWillUpdate() {
         LayoutAnimation.spring();
     }
 
+    //default component level state
     state = {
         progress: 0,
         interests: []
     };
 
+    //render border of selected tile
     renderBorder(id) {
         if(this.state.interests.indexOf(id) > -1) {
-            return {
-                borderWidth: 4,
-                borderColor: '#FF6F00'
-            };
+            return styles.selectedInterestStyle;
         }
         return;
     }
 
+    //determine progress as user taps
     renderProgress = (id) => {
         if(this.state.interests.indexOf(id) === -1) {
             let interests = this.state.interests;
@@ -124,15 +127,21 @@ class Interests extends Component {
         }
     }
 
-
+    //render the different tiles
     renderInterests() {
+        const {
+            interestGridStyle,
+            interestContainerStyle,
+            interestIconStyle,
+            interestTextStyle
+        } = styles;
         return DATA.interests.map((interest) => {
             return (
                 <TouchableOpacity onPress={() => {this.renderProgress(interest.id)}} key={interest.id}>
-                    <View style={{width: SCREEN_WIDTH / 3, height: SCREEN_WIDTH / 3, position:'relative'}}>
-                        <View style={[{position: 'absolute', left: 8, right: 8, bottom: 8, top: 8, backgroundColor: 'white', alignItems: 'center', justifyContent:'center' }, this.renderBorder(interest.id)]}>
-                            <Image source={interest.icon} style={{width: 50, height: 50}} />
-                            <Text style={{marginTop: 6}}>{interest.name}</Text>
+                    <View style={ interestGridStyle }>
+                        <View style={[ interestContainerStyle , this.renderBorder(interest.id)]}>
+                            <Image source={interest.icon} style={ interestIconStyle } />
+                            <Text style={ interestTextStyle }>{interest.name}</Text>
                         </View>
                     </View>
                 </TouchableOpacity>
@@ -140,11 +149,19 @@ class Interests extends Component {
         });
     }
 
+    //if user has selected 5 or more interests, show continue button
     renderContinueButton() {
+        const {
+            buttonStyleContainer,
+            buttonStyle,
+            buttonTextStyle
+        } = styles;
         if( this.state.interests.length >= 5) {
             return(
-                <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                    <Button style={{backgroundColor: '#FF6F00', alignItems: 'center'}}><Text style={{color: 'white', fontWeight: 'bold'}}>You're all set! Start Your Adventure</Text></Button>
+                <View style={ buttonStyleContainer }>
+                    <Button onPress={() => this.props.navigation.navigate('feed') } style={ buttonStyle }>
+                        <Text style={ buttonTextStyle }>You're all set! Start Your Adventure</Text>
+                    </Button>
                 </View>
             );
         }
@@ -152,23 +169,115 @@ class Interests extends Component {
     }
 
     render() {
+        const {
+            mainContainerStyle,
+            heroMessageContainerStyle,
+            mainTextStyle,
+            mainTextDescStyle,
+            progressContainerStyle,
+            progressStyle,
+            scrollContainerStyle,
+            scrollViewStyle
+        } = styles;
         return (
-            <View style={{flex: 1}}>
-                <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                    <Text style={{textAlign: 'center', fontSize: 22, fontWeight: 'bold', color: '#FF6F00'}}>Let's Get Personal</Text>
-                    <Text style={{textAlign: 'center', fontSize: 16, color: '#333', padding: 16}}>For a personalized experience we need to know what are you in to. Choose your favorite interests</Text>
+            <View style={ mainContainerStyle }>
+                <View style={ heroMessageContainerStyle }>
+                    <Text style={ mainTextStyle }>Let's Get Personal</Text>
+                    <Text style={ mainTextDescStyle }>
+                        For a personalized experience we need to know what are you in to. Choose your favorite interests
+                    </Text>
                     {this.renderContinueButton()}
                 </View>
-                <View style={{height: 6, width: SCREEN_WIDTH, backgroundColor:'#F5F5F5'}}>
-                    <View style={{height: 6, width: SCREEN_WIDTH * this.state.progress, backgroundColor: '#FF6F00'}} />
+                <View style={ progressContainerStyle }>
+                    <View style={ [ progressStyle, { width: SCREEN_WIDTH * this.state.progress } ] } />
                 </View>
-                <View style={{flex: 2, backgroundColor: '#EEEEEE', flexDirection:'row', flexWrap: 'wrap'}}>
-                    <ScrollView contentContainerStyle={{flexDirection: 'row', flexWrap: 'wrap'}}>
+                <View style={ scrollContainerStyle }>
+                    <ScrollView contentContainerStyle={ scrollViewStyle }>
                         {this.renderInterests()}
                     </ScrollView>
                 </View>
             </View>
         );
+    }
+}
+
+const styles = {
+    mainContainerStyle: {
+        flex: 1
+    },
+    heroMessageContainerStyle: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    mainTextStyle: {
+        textAlign: 'center',
+        fontSize: 22,
+        fontWeight: 'bold',
+        color: '#FF6F00'
+    },
+    mainTextDescStyle: {
+        textAlign: 'center',
+        fontSize: 16,
+        color: '#333',
+        padding: 16
+    },
+    progressContainerStyle: {
+        height: 6,
+        width: SCREEN_WIDTH,
+        backgroundColor:'#F5F5F5'
+    },
+    progressStyle: {
+        height: 6,
+        backgroundColor: '#FF6F00'
+    },
+    scrollContainerStyle: {
+        flex: 2,
+        backgroundColor: '#EEEEEE',
+        flexDirection:'row',
+        flexWrap: 'wrap'
+    },
+    scrollViewStyle: {
+        flexDirection: 'row',
+        flexWrap: 'wrap'
+    },
+    buttonStyleContainer: {
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    buttonStyle: {
+        backgroundColor: '#FF6F00',
+        alignItems: 'center'
+    },
+    buttonTextStyle: {
+        color: 'white',
+        fontWeight: 'bold'
+    },
+    interestGridStyle: {
+        width: SCREEN_WIDTH / 3,
+        height: SCREEN_WIDTH / 3,
+        position:'relative'
+    },
+    interestContainerStyle: {
+        position: 'absolute',
+        left: 8,
+        right: 8,
+        bottom: 8,
+        top: 8,
+        backgroundColor: 'white',
+        alignItems: 'center',
+        justifyContent:'center'
+    },
+    interestIconStyle: {
+        width: 50,
+        height: 50
+    },
+    interestTextStyle: {
+        marginTop: 6
+    },
+    selectedInterestStyle: {
+        borderWidth: 4,
+        borderColor: '#FF6F00'
     }
 }
 
