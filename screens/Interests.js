@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, TouchableOpacity, Dimensions, ScrollView, Image, LayoutAnimation } from 'react-native';
+import { View, Text, TouchableOpacity, Dimensions, ScrollView, Image, LayoutAnimation, UIManager } from 'react-native';
 import { Button } from 'native-base';
 
 //get screen width
@@ -87,6 +87,12 @@ const DATA = {
 
 class Interests extends Component {
 
+    componentDidMount() {
+        //poor android
+        UIManager.setLayoutAnimationEnabledExperimental &&
+        UIManager.setLayoutAnimationEnabledExperimental(true);
+    }
+
     //nice spring animation
     componentWillUpdate() {
         LayoutAnimation.spring();
@@ -159,7 +165,7 @@ class Interests extends Component {
         if( this.state.interests.length >= 5) {
             return(
                 <View style={ buttonStyleContainer }>
-                    <Button onPress={() => this.props.navigation.navigate('feed') } style={ buttonStyle }>
+                    <Button onPress={() => this.props.navigation.navigate('mainApp') } style={ buttonStyle }>
                         <Text style={ buttonTextStyle }>You're all set! Start Your Adventure</Text>
                     </Button>
                 </View>
@@ -266,7 +272,8 @@ const styles = {
         top: 8,
         backgroundColor: 'white',
         alignItems: 'center',
-        justifyContent:'center'
+        justifyContent:'center',
+        borderRadius: 30
     },
     interestIconStyle: {
         width: 50,
