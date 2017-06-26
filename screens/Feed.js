@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StatusBar, Image, Dimensions, FlatList, List, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, StatusBar, Image, Dimensions, FlatList, List, TouchableOpacity, TouchableWithoutFeedback, Platform } from 'react-native';
 import { Container, Content, Card, CardItem, Thumbnail, Button, Icon, Left, Body } from 'native-base';
 
 import Share, {ShareSheet} from 'react-native-share';
@@ -10,7 +10,7 @@ const SCREEN_HEIGHT = Dimensions.get('window').height;
 const DATA = [
     {
         id: 0,
-        banner: 'http://lorempixel.com/1920/1080/',
+        banner: 'https://blog.algolia.com/wp-content/uploads/2015/12/react-native.png',
         eventName: "React Native Essential Training",
         date: 'June 7th',
         from: '8 pm',
@@ -137,10 +137,12 @@ class Feed extends Component {
         } = styles;
         return (
             <View style={cardContainerStyle}>
-                <Image
-                    style={cardImageStyle}
-                    source={{uri: event.banner}}
-                    resizeMode="cover" />
+                <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('singleEvent')}>
+                    <Image
+                        style={cardImageStyle}
+                        source={{uri: event.banner}}
+                        resizeMode="cover" />
+                </TouchableWithoutFeedback>
                 <View>
                     <View style={eventMetaContainerStyle}>
                         <View style={dateContainerStyle}>
@@ -158,13 +160,15 @@ class Feed extends Component {
                             </TouchableOpacity>
                         </View>
                     </View>
-                    <View style={eventNameContainerStyle}>
-                        <Text style={eventNameStyle}>{event.eventName}</Text>
-                    </View>
+                    <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('singleEvent')}>
+                        <View style={eventNameContainerStyle}>
+                            <Text style={eventNameStyle}>{event.eventName}</Text>
+                        </View>
+                    </TouchableWithoutFeedback>
                     <View style={bottomMetaContainerStyle}>
                         <View style={locationContainerStyle}>
                             <Icon style={pinStyle} name='md-pin' />
-                            <TouchableOpacity onPress={() => this.props.navigation.navigate('Map')}>
+                            <TouchableOpacity onPress={() => this.props.navigation.navigate('map')}>
                                 <Text style={locationNameStyle}>{event.locationName}</Text>
                             </TouchableOpacity>
                         </View>
