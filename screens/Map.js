@@ -222,6 +222,7 @@ class Map extends Component {
                     title={event.eventName}
                     description={event.eventLocationDesc}
                     image={event.eventMarker}
+                    onCalloutPress = {() => this.props.navigation.navigate('singleEvent')}
                 >
                     {this.renderMarkerCallouts(event)}
                 </MapView.Marker>
@@ -296,10 +297,10 @@ const styles = {
         color: 'white'
     },
     calloutContainerStyle: {
-        width: 250,
+        width: Platform.OS === 'android' ? 250 : 200,
         backgroundColor: 'white',
         borderRadius: 20,
-        padding: 8
+        padding: Platform.OS === 'android' ? 8 : 0
     },
     calloutLocationTextStyle: {
         opacity:0.7,

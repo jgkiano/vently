@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Image, Dimensions, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, Image, Dimensions, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { Icon, Button } from 'native-base';
 import { BackButton } from '../components';
 import { MapView } from 'expo';
@@ -10,6 +10,9 @@ const camera = require('../assets/images/camera.png');
 
 const LONG_DELTA = 0.0094;
 const LAT_DELTA = 0.0139;
+
+const MINIMUM_NUMBER_OF_TICKETS = 1;
+const MAXIMUM_NUMBER_OF_TICKETS = 3;
 
 const DATA = {
     id: 0,
@@ -30,6 +33,14 @@ const DATA = {
 }
 
 class Single extends Component {
+
+    state = {
+        pricePerTicket: DATA.ticketPrice,
+        total: DATA.ticketPrice,
+        tickets: 1,
+        liked: false
+    }
+
     static navigationOptions = ({ navigation }) => ({
         title: 'React Native Essential Training',
         tabBarIcon: ({ tintColor }) => {
@@ -47,12 +58,36 @@ class Single extends Component {
         headerRight: <TouchableOpacity><Icon style={{marginRight: 15, color: 'white'}} name='md-star-outline' /></TouchableOpacity>,
     });
 
+    ticketCalculator = async (op) => {
+        await this.setState({
+            tickets: op == 'add' ? this.state.tickets + 1: this.state.tickets - 1
+        }, async () => {
+            if(this.state.tickets > MAXIMUM_NUMBER_OF_TICKETS) {
+                await this.setState({ tickets: MAXIMUM_NUMBER_OF_TICKETS });
+            }
+            if(this.state.tickets < MINIMUM_NUMBER_OF_TICKETS) {
+                await this.setState({ tickets: MINIMUM_NUMBER_OF_TICKETS });
+            }
+            await this.setState({
+                total: this.state.tickets * this.state.pricePerTicket
+            });
+        });
+    };
 
+    confirmOrder = () => {
+        Alert.alert(
+            'Almost there!',
+            `You\'re almost done. We need you to confirm your order for ${this.state.tickets} ticket(s) for ${DATA.eventName} at KES ${this.state.total}`,
+            [
+                {text: 'Confirm', onPress: () => this.props.navigation.navigate('pay') },
+                {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+            ],
+            { cancelable: false }
+        )
+    };
 
-    render() {
-        console.ignoredYellowBox = ['Warning: View.propTypes'];
+    renderTicketBuyWidget = () => {
         const {
-            container,
             ticketBuyContainerStyle,
             ticketBuyButtonContainerStyle,
             ticketBuyButtonStyle,
@@ -61,6 +96,53 @@ class Single extends Component {
             ticketPriceContainer,
             buyTicketButtonContainerStyle,
             buyTicketButtonTextStyle,
+        } = styles;
+        return (
+            <View style={ticketBuyContainerStyle}>
+                <View style={ticketBuyButtonContainerStyle}>
+                    <Button onPress={() => this.ticketCalculator()} style={ticketBuyButtonStyle} small>
+                        <Text style={ticketBuyButtonTextStyle}>-</Text>
+                    </Button>
+                    <Text style={ticketNumberTextStyle}>{this.state.tickets}</Text>
+                    <Button onPress={() => this.ticketCalculator("add") } style={ticketBuyButtonStyle} small>
+                        <Text style={ticketBuyButtonTextStyle}>+</Text>
+                    </Button>
+                </View>
+                <View style={ticketPriceContainer}>
+                    <Text>KES {this.state.total}</Text>
+                </View>
+                <View style={buyTicketButtonContainerStyle}>
+                    <Button onPress={() => this.confirmOrder()} style={ticketBuyButtonStyle}>
+                        <Text style={buyTicketButtonTextStyle}>Buy Ticket</Text>
+                    </Button>
+                </View>
+            </View>
+        );
+    };
+
+    renderMapLocation = () => {
+        const {mapViewStyle} = styles;
+        return (
+            <MapView style={mapViewStyle}
+                initialRegion={DATA.locationRegion}
+                cacheEnabled={true}
+                scrollEnabled={false}
+            >
+                <MapView.Marker
+                    coordinate={{latitude: DATA.locationRegion.latitude, longitude: DATA.locationRegion.longitude}}
+                    title={DATA.locationDesc}
+                    onCalloutPress = {() => console.log("pressed callout")}
+                />
+            </MapView>
+        );
+    };
+
+
+
+    render() {
+        console.ignoredYellowBox = ['Warning: View.propTypes'];
+        const {
+            container,
             scrollContainerStyle,
             heroImageContainerStyle,
             heroImageStyle,
@@ -72,30 +154,11 @@ class Single extends Component {
             sectionTitleStyle,
             plainTextContainerStyle,
             plainTextStyle,
-            mapViewStyle,
             timeIconStyle
         } = styles;
         return (
             <View style={container}>
-                <View style={ticketBuyContainerStyle}>
-                    <View style={ticketBuyButtonContainerStyle}>
-                        <Button style={ticketBuyButtonStyle} small>
-                            <Text style={ticketBuyButtonTextStyle}>-</Text>
-                        </Button>
-                        <Text style={ticketNumberTextStyle}>1</Text>
-                        <Button style={ticketBuyButtonStyle} small>
-                            <Text style={ticketBuyButtonTextStyle}>+</Text>
-                        </Button>
-                    </View>
-                    <View style={ticketPriceContainer}>
-                        <Text>KES {DATA.ticketPrice}</Text>
-                    </View>
-                    <View style={buyTicketButtonContainerStyle}>
-                        <Button style={ticketBuyButtonStyle}>
-                            <Text style={buyTicketButtonTextStyle}>Buy Ticket</Text>
-                        </Button>
-                    </View>
-                </View>
+                {this.renderTicketBuyWidget()}
                 <ScrollView style={scrollContainerStyle}>
                     <View style={container}>
                         <View style={heroImageContainerStyle}>
@@ -129,17 +192,7 @@ class Single extends Component {
                             <Text style={plainTextStyle}>{DATA.eventDesc}</Text>
                         </View>
                         <Text style={sectionTitleStyle}>Location</Text>
-                        <MapView style={mapViewStyle}
-                            initialRegion={DATA.locationRegion}
-                            cacheEnabled={true}
-                            scrollEnabled={false}
-                        >
-                            <MapView.Marker
-                                coordinate={{latitude: DATA.locationRegion.latitude, longitude: DATA.locationRegion.longitude}}
-                                title={DATA.locationDesc}
-                                onCalloutPress = {() => console.log("pressed callout")}
-                            />
-                        </MapView>
+                        {this.renderMapLocation()}
                     </View>
                 </ScrollView>
             </View>

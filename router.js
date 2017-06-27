@@ -15,6 +15,7 @@ import TicketScreen from './screens/Tickets';
 import ProfileScreen from './screens/Profile';
 import SettingsScreen from './screens/Settings';
 import MapScreen from './screens/Map';
+import PayScreen from './screens/Pay';
 
 
 const MainNavigator = TabNavigator({
@@ -33,7 +34,12 @@ const MainNavigator = TabNavigator({
                     backgroundColor: '#FF6F00',
                 },
             }},
-            singleEvent: { screen: SingleEventScreen }
+            singleEvent: { screen: SingleEventScreen },
+            pay: { screen: PayScreen, navigationOptions: {
+                headerStyle: {
+                    backgroundColor: '#FF6F00',
+                },
+            }},
         }, {
             cardStyle: {
                 borderTopWidth: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
