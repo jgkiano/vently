@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
-import { View, Text, ScrollView, Dimensions, Image } from 'react-native';
+import { View, Text, ScrollView, Dimensions, Image, Platform } from 'react-native';
 import { Button } from 'native-base';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
-const slide1 = require('../assets/images/slide1.jpg');
-const slide2 = require('../assets/images/slide2.jpg');
-const slide3 = require('../assets/images/slide3.jpg');
-const slide4 = require('../assets/images/slide4.jpg');
+const slide1 = Platform.OS === 'ios' ? require('../assets/images/slide1.jpg') : require('../assets/images/android-slide1.jpg');
+const slide2 = Platform.OS === 'ios' ? require('../assets/images/slide2.jpg') : require('../assets/images/android-slide2.jpg');
+const slide3 = Platform.OS === 'ios' ? require('../assets/images/slide3.jpg') : require('../assets/images/android-slide3.jpg');
+const slide4 = Platform.OS === 'ios' ? require('../assets/images/slide4.jpg') : require('../assets/images/android-slide4.jpg');
 
 const DATA = [
     {

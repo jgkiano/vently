@@ -20,6 +20,20 @@ import PayScreen from './screens/Pay';
 
 const MainNavigator = TabNavigator({
 
+        tickets: { screen: StackNavigator({
+            list: { screen: TicketScreen, navigationOptions: {
+                headerStyle: {
+                    backgroundColor: '#FF6F00',
+                },
+            } },
+            single: { screen: TicketScreen }
+        }, {
+            cardStyle: {
+                borderTopWidth: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
+                borderColor: "#FF6F00"
+            }
+        }) },
+
 
 
         feed: { screen: StackNavigator({
@@ -47,7 +61,7 @@ const MainNavigator = TabNavigator({
             }
         })},
 
-        tickets: { screen: TicketScreen },
+
 
         profile: { screen: ProfileScreen },
 
@@ -91,29 +105,27 @@ const MainNavigator = TabNavigator({
 //
 //     interests: { screen: InterestsScreen },
 //
-//
-//
 //     mainApp: { screen: TabNavigator({
 //
 //
+//         feed: { screen: StackNavigator({
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//         events: { screen: StackNavigator({
 //             feed: { screen: EventFeedScreen, navigationOptions: {
 //                 headerStyle: {
 //                     backgroundColor: '#FF6F00',
 //                 },
-//                 statusBarStyle: 'light-content',
 //             }},
-//             singleEvent: { screen: SingleEventScreen }
+//             map: { screen: MapScreen, navigationOptions: {
+//                 headerStyle: {
+//                     backgroundColor: '#FF6F00',
+//                 },
+//             }},
+//             singleEvent: { screen: SingleEventScreen },
+//             pay: { screen: PayScreen, navigationOptions: {
+//                 headerStyle: {
+//                     backgroundColor: '#FF6F00',
+//                 },
+//             }},
 //         }, {
 //             cardStyle: {
 //                 borderTopWidth: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
@@ -126,10 +138,6 @@ const MainNavigator = TabNavigator({
 //         profile: { screen: ProfileScreen },
 //
 //         settings: { screen: SettingsScreen },
-//
-//
-//
-//
 //
 //     }, {
 //         navigationOptions: {
@@ -155,20 +163,6 @@ const MainNavigator = TabNavigator({
 //         animationEnabled: true,
 //
 //     })},
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 //
 //
 //

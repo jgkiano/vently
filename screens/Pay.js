@@ -4,7 +4,8 @@ import { Icon, Spinner } from 'native-base';
 import { BackButton } from '../components';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
-const PAY_URL = 'http://192.168.1.100:3000/api/pay/dummy';
+const SCREEN_HEIGHT = Dimensions.get('window').height;
+const PAY_URL = 'http://192.168.88.37:3000/api/pay/dummy';
 
 class Pay extends Component {
 
@@ -27,7 +28,6 @@ class Pay extends Component {
                 {(this.state.webLoaded) ? null : <Spinner style={{backgroundColor: 'transparent'}} color="#FF6F00" />}
                 <WebView
                     source={{uri: PAY_URL}}
-                    style={{flex:1, width: SCREEN_WIDTH}}
                     onLoadEnd={() => this.setState({webLoaded: true})}
                 />
             </View>

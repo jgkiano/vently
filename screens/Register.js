@@ -92,7 +92,7 @@ class Register extends Component {
                             <Input />
                         </Item>
                     </View>
-                    <Button style={ buttonStyle } block warning onPress={() => this.props.navigation.navigate('interests') }>
+                    <Button style={ buttonStyle } block warning onPress={() => this.props.navigation.navigate('interests',{user:'julius'}) }>
                         <Text style={buttonTextStyle}>Sign Up</Text>
                     </Button>
                     <TouchableOpacity>

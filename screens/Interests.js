@@ -175,6 +175,9 @@ class Interests extends Component {
     }
 
     render() {
+        if(this.props.navigation.state.params) {
+            console.log("-->",this.props.navigation.state.params.user,"<--");
+        }
         const {
             mainContainerStyle,
             heroMessageContainerStyle,
