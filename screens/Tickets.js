@@ -34,23 +34,34 @@ class Tickets extends Component {
             time,
             tickets
         } = ticketInfo;
+        const {
+            listContainerStyle,
+            leftListContainerStyle,
+            eventTitleStyle,
+            eventMetaContainerStyle,
+            singleMetaContainerStyle,
+            iconStyle,
+            metaTextStyle,
+            arrowRightStyle,
+            arrowContainerStyle
+        } = styles;
         return (
-            <View style={{padding:16, backgroundColor: "#eeeeee", borderBottomWidth: 1, borderColor:"rgba(51,51,51,0.1)", flexDirection:"row"}}>
-                <View style={{flex: 9}}>
-                    <Text style={{fontSize: 16, marginBottom: 8, opacity: 0.9}}>{eventName}</Text>
-                    <View style={{flexDirection: 'row'}}>
-                        <View style={{flexDirection: 'row', justifyContent:'center', alignItems:'center', marginRight: 16}}>
-                            <Icon style={{fontSize: 18, marginRight: 8, color: "#FF6F00"}} name="md-calendar"></Icon>
-                            <Text style={{opacity: 0.7}}>{time}</Text>
+            <View style={listContainerStyle}>
+                <View style={leftListContainerStyle}>
+                    <Text style={eventTitleStyle}>{eventName}</Text>
+                    <View style={eventMetaContainerStyle}>
+                        <View style={singleMetaContainerStyle}>
+                            <Icon style={iconStyle} name="md-calendar"></Icon>
+                            <Text style={metaTextStyle}>{time}</Text>
                         </View>
-                        <View style={{flexDirection: 'row', justifyContent:'center', alignItems:'center', marginRight: 16}}>
-                            <Icon style={{fontSize: 18, marginRight: 8, color: "#FF6F00"}} name="md-pricetag"></Icon>
-                            <Text style={{opacity: 0.7}}>{tickets} ticket</Text>
+                        <View style={singleMetaContainerStyle}>
+                            <Icon style={iconStyle} name="md-pricetag"></Icon>
+                            <Text style={metaTextStyle}>{tickets} ticket</Text>
                         </View>
                     </View>
                 </View>
-                <View style={{flex: 1, justifyContent:"center", alignItems:"flex-end"}}>
-                    <Icon style={{opacity: 0.3}} name="ios-arrow-forward" />
+                <View style={arrowContainerStyle}>
+                    <Icon style={arrowRightStyle} name="ios-arrow-forward" />
                 </View>
             </View>
         );
@@ -91,6 +102,46 @@ const styles = {
         color: 'white',
         paddingLeft: (Platform.OS === 'ios') ? 0 : 15,
     },
+    listContainerStyle: {
+        padding:16,
+        backgroundColor: "#eeeeee",
+        borderBottomWidth: 1,
+        borderColor:"rgba(51,51,51,0.1)",
+        flexDirection:"row"
+    },
+    leftListContainerStyle: {
+        flex: 9
+    },
+    eventTitleStyle: {
+        fontSize: 16,
+        marginBottom: 8,
+        opacity: 0.9
+    },
+    eventMetaContainerStyle: {
+        flexDirection: 'row'
+    },
+    singleMetaContainerStyle: {
+        flexDirection: 'row',
+        justifyContent:'center',
+        alignItems:'center',
+        marginRight: 16
+    },
+    iconStyle: {
+        fontSize: 18,
+        marginRight: 8,
+        color: "#FF6F00"
+    },
+    metaTextStyle: {
+        opacity: 0.7
+    },
+    arrowContainerStyle: {
+        flex: 1,
+        justifyContent:'center',
+        alignItems:'flex-end'
+    },
+    arrowRightStyle: {
+        opacity: 0.3
+    }
 }
 
 export default Tickets;
