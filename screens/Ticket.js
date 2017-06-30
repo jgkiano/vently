@@ -1,28 +1,41 @@
 import React, { Component } from 'react';
-import { View, Text, Platform, TouchableOpacity, Dimensions, Image, TouchableHighlight } from 'react-native';
-import { Icon, Button } from 'native-base';
+import { View, Text, Platform, TouchableOpacity, Dimensions, Image, TouchableHighlight, Modal } from 'react-native';
+import { Icon, Button, Badge } from 'native-base';
 import { BackButton } from '../components';
 import QRCode from 'react-native-qrcode';
-
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
+const DATA = {
+    id: 0,
+    eventName: "React Native Essential Training",
+    eventDate: "Wed, 27 July 8:00AM to 12:00PM",
+    eventLocation: "Strathmore University",
+    banner: "https://blog.algolia.com/wp-content/uploads/2015/12/react-native.png",
+    numberOfTickets: 1
+}
+
 class SingleTicket extends Component {
     state = {
-        isCodeVisible: false
+        isCodeVisible: false,
+        modalVisible: false
     }
     static navigationOptions = ({ navigation }) => ({
         title: 'React Native Essential Training Ticket',
         headerTitle: <Text style={styles.titleStyle}>EVENT TICKET</Text>,
-        headerRight: <TouchableOpacity
-            onPress={() => {navigation.navigate('map')}}
-            ><Icon style={styles.planeIconStyle} name='ios-paper-plane' /></TouchableOpacity>,
         tabBarIcon: ({ tintColor }) => {
-            return <Icon style={{ color: tintColor }} name = 'ios-home' />;
+            return <Icon style={{ color: tintColor }} name = 'md-pricetags' />;
         },
+        headerRight: <TouchableOpacity
+            onPress={() => {navigation.navigate('share')}}
+            ><Icon style={styles.planeIconStyle} name='md-paper-plane' /></TouchableOpacity>,
         headerLeft: <BackButton back={navigation.goBack}/>
     });
+
+    setModalVisible(visible) {
+        this.setState({modalVisible: visible});
+    }
 
     renderTicketInfo = () => {
         const {
@@ -32,21 +45,23 @@ class SingleTicket extends Component {
             iconStyle,
             metaTextStyle,
             buttonStyle,
-            buttonTextStyle
+            buttonTextStyle,
+            qrContainer,
+            backTextStyle
         } = styles;
         if(this.state.isCodeVisible) {
             return (
-                <View style={{flex: 1, position:"relative", top: -20, justifyContent: "center", alignItems:"center"}}>
+                <View style={qrContainer}>
                     <TouchableHighlight onPress={() => this.setState({isCodeVisible: false})}>
                         <View>
                             <QRCode
-                                value={"hello"}
+                                value={DATA.id}
                                 bgColor='#FF6F00'
                                 fgColor='white'
                             />
                         </View>
                     </TouchableHighlight>
-                    <Text style={{marginTop: 8, opacity: 0.8}}>Tap code to go back</Text>
+                    <Text style={backTextStyle}>Tap code to go back</Text>
                 </View>
             );
         }
@@ -54,18 +69,18 @@ class SingleTicket extends Component {
             <View>
                 <View style={singleMetaContainerStyle}>
                     <Icon style={iconStyle} name="md-pricetag"></Icon>
-                    <Text style={metaTextStyle}>1 Ticket</Text>
+                    <Text style={metaTextStyle}>{DATA.numberOfTickets} Ticket</Text>
                 </View>
-                <Text style={{fontSize: 18, marginBottom: 12, marginTop: 12}}>React Native Essential Training</Text>
+                <Text style={{fontSize: 18, marginBottom: 12, marginTop: 12}}>{DATA.eventName}</Text>
                 <View style={[singleMetaContainerStyle, {marginBottom: 8}]}>
                     <Icon style={iconStyle} name="md-calendar"></Icon>
-                    <Text style={[metaTextStyle]}>Wed, 27 July 8:00AM to 12:00PM</Text>
+                    <Text style={[metaTextStyle]}>{DATA.eventDate}</Text>
                 </View>
                 <View style={singleMetaContainerStyle}>
                     <Icon style={iconStyle} name="md-pin"></Icon>
-                    <Text style={metaTextStyle}>Strathmore University</Text>
+                    <Text style={metaTextStyle}>{DATA.eventLocation}</Text>
                 </View>
-                <Button style={ buttonStyle } block warning onPress={() => this.setState({isCodeVisible: true})}>
+                <Button style={ buttonStyle } block warning onPress={() =>  this.setState({isCodeVisible: true})}>
                     <Text style={buttonTextStyle}>Generate Code</Text>
                 </Button>
             </View>
@@ -80,17 +95,20 @@ class SingleTicket extends Component {
             iconStyle,
             metaTextStyle,
             buttonStyle,
-            buttonTextStyle
+            buttonTextStyle,
+            ticketContainerStyle,
+            ticketImageStyle,
+            ticketInfoContainerStyle
         } = styles;
         return (
             <View style={{flex: 1, width: SCREEN_WIDTH}}>
-                <View style={{position: 'absolute', top: 15, left: 15, right: 15, bottom: 15, backgroundColor: 'white', borderRadius: 15, overflow:"hidden"}}>
+                <View style={ticketContainerStyle}>
                     <View style={leftTicketCircleStyle} />
                     <View style={rightTicketCircleStyle} />
                     <View style={{flex:1}}>
-                        <Image resizeMode="cover" source={{uri: 'https://blog.algolia.com/wp-content/uploads/2015/12/react-native.png'}} style={{width: "100%", flex:1, borderRadius: 15, overflow:"hidden"}} />
+                        <Image resizeMode="cover" source={{uri: DATA.banner}} style={ticketImageStyle} />
                     </View>
-                    <View style={{flex:1, position:"relative", top: 20, paddingLeft: 15, paddingRight: 15}}>
+                    <View style={ticketInfoContainerStyle}>
                         {this.renderTicketInfo()}
                     </View>
                 </View>
@@ -151,6 +169,40 @@ const styles = {
     metaTextStyle: {
         opacity: 0.7
     },
+    ticketContainerStyle: {
+        position: 'absolute',
+        top: 15,
+        left: 15,
+        right: 15,
+        bottom: 15,
+        backgroundColor: 'white',
+        borderRadius: 15,
+        overflow:"hidden"
+    },
+    ticketImageStyle: {
+        width: "100%",
+        flex:1,
+        borderRadius: 15,
+        overflow:"hidden"
+    },
+    ticketInfoContainerStyle: {
+        flex:1,
+        position:"relative",
+        top: 20,
+        paddingLeft: 15,
+        paddingRight: 15
+    },
+    qrContainer: {
+        flex: 1,
+        position:"relative",
+        top: -20,
+        justifyContent: "center",
+        alignItems:"center"
+    },
+    backTextStyle: {
+        marginTop: 8,
+        opacity: 0.8
+    }
 }
 
 export default SingleTicket;

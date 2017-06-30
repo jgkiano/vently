@@ -17,6 +17,7 @@ import SettingsScreen from './screens/Settings';
 import MapScreen from './screens/Map';
 import PayScreen from './screens/Pay';
 import SingleTicketScreen from './screens/Ticket';
+import ShareTicketScreen from './screens/Share';
 
 
 const MainNavigator = TabNavigator({
@@ -28,6 +29,11 @@ const MainNavigator = TabNavigator({
                 },
             } },
             single: { screen: SingleTicketScreen, navigationOptions: {
+                headerStyle: {
+                    backgroundColor: '#FF6F00',
+                },
+            } },
+            share: { screen: ShareTicketScreen, navigationOptions: {
                 headerStyle: {
                     backgroundColor: '#FF6F00',
                 },
