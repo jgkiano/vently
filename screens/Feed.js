@@ -197,6 +197,7 @@ class Feed extends Component {
                     renderItem={ ({item}) => this.renderList(item) }
                     keyExtractor={item => item.id}
                     extraData={this.state}
+                    removeClippedSubviews={false}
                 />
             </View>
         );
