@@ -122,7 +122,9 @@ class Share extends Component {
         if(this.state.permissionGranted === false) {
             return (
                 <View style={errorContainerStyle}>
-                    <Text style={errorTextStyle}>Hey there! To share tickets with your buddies we kinda need to access your contacts. We promise not to spam them.</Text>
+                    <Text style={errorTextStyle}>
+                        Hey there! To share tickets with your buddies we kinda need to access your contacts. We promise not to spam them.
+                    </Text>
                     <View style={errorButtonContainerStyle}>
                         <Button style={errorButtonStyle} onPress={() => this.getContactsPermission()}>
                             <Text style={errorButtonTextStyle}>Grant Permission</Text>

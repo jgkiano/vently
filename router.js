@@ -22,6 +22,8 @@ import ShareTicketScreen from './screens/Share';
 
 const MainNavigator = TabNavigator({
 
+        profile: { screen: ProfileScreen },
+
         tickets: { screen: StackNavigator({
             list: { screen: TicketScreen, navigationOptions: {
                 headerStyle: {
@@ -74,7 +76,7 @@ const MainNavigator = TabNavigator({
 
 
 
-        profile: { screen: ProfileScreen },
+
 
         settings: { screen: SettingsScreen },
 
