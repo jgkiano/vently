@@ -28,7 +28,6 @@ class Share extends Component {
     }
 
     getPhoneContacts = async (offset = 0) => {
-        console.log("called");
         const { total } = await Expo.Contacts.getContactsAsync();
         const { data } = await Expo.Contacts.getContactsAsync({
             fields: [
@@ -65,13 +64,19 @@ class Share extends Component {
     };
 
     renderItem = (contact) => {
+        const  {
+            listItemContainerStyle,
+            listAvatarContainerStyle,
+            avatarStyle,
+            contactTextStyle,
+        } = styles;
         return (
             <TouchableOpacity onPress={() => this.contactPressed(contact)}>
-                <View style={{flexDirection: 'row', paddingLeft: 15, paddingRight: 15, alignItems: 'center', backgroundColor: 'white', paddingTop: 15, paddingBottom: 15, borderBottomWidth:1, borderColor:"rgba(51,51,51,0.2)"}}>
-                    <View style={{width: 50, height: 50, backgroundColor: 'black', borderRadius: 25, backgroundColor: '#FF6F00', alignItems: 'center', justifyContent:'center'}}>
-                        <Text style={{color: 'white', fontSize: 18}}>{contact.name.charAt(0).toUpperCase()}</Text>
+                <View style={listItemContainerStyle}>
+                    <View style={listAvatarContainerStyle}>
+                        <Text style={avatarStyle}>{contact.name.charAt(0).toUpperCase()}</Text>
                     </View>
-                    <Text style={{marginLeft: 15, fontSize: 18, opacity: 0.9}}>{contact.name}</Text>
+                    <Text style={contactTextStyle}>{contact.name}</Text>
                 </View>
             </TouchableOpacity>
         );
@@ -96,20 +101,19 @@ class Share extends Component {
         );
     };
 
-    setInputText = () => {
-        if(!this.state.hasUserStartedTyping) {
-
-        }
-    }
-
-    renderSpinner = () => {
+    renderContactScreen = () => {
         const {
             errorButtonStyle,
-            errorButtonTextStyle
+            errorButtonTextStyle,
+            errorContainerStyle,
+            errorTextStyle,
+            loadingContainerStyle,
+            inputContainerStyle,
+            itemContainerStyle,
         } = styles;
         if(this.state.contacts === null && this.state.permissionGranted === true) {
             return (
-                <View style={{flex: 1, alignItems: 'center', justifyContent:'center'}}>
+                <View style={loadingContainerStyle}>
                     <Spinner size='large' color='#FF6F00' />
                     <Text>Accessing contacts..this may take a while</Text>
                 </View>
@@ -117,17 +121,19 @@ class Share extends Component {
         }
         if(this.state.permissionGranted === false) {
             return (
-                <View style={{flex: 1, alignItems: 'center', justifyContent:'center'}}>
-                    <Text style={{textAlign:"center", fontSize: 16, padding: 18}}>Hey there! To share tickets with your buddies we kinda need to access your contacts. We promise not to spam them.</Text>
-                    <View style={{flexDirection:'row', alignItems:'center', justifyContent:'center'}}>
-                        <Button style={errorButtonStyle} onPress={() => this.getContactsPermission()}><Text style={errorButtonTextStyle}>Grant Permission</Text></Button>
+                <View style={errorContainerStyle}>
+                    <Text style={errorTextStyle}>Hey there! To share tickets with your buddies we kinda need to access your contacts. We promise not to spam them.</Text>
+                    <View style={errorButtonContainerStyle}>
+                        <Button style={errorButtonStyle} onPress={() => this.getContactsPermission()}>
+                            <Text style={errorButtonTextStyle}>Grant Permission</Text>
+                        </Button>
                     </View>
                 </View>
             );
         }
         return (
-            <View style={{flex: 1, marginTop: 15}}>
-                <Item style={{marginLeft: 15, marginRight: 15, marginBottom: 15}} floatingLabel>
+            <View style={inputContainerStyle}>
+                <Item style={itemContainerStyle} floatingLabel>
                     <Label>Contact Name</Label>
                     <Input autoCapitalize="words" autoCorrect={false} value={this.state.typedValue} onChangeText={(text) => this.setState({typedValue: text})} />
                 </Item>
@@ -139,7 +145,7 @@ class Share extends Component {
     render() {
         return (
             <View style={{flex: 1}}>
-                {this.renderSpinner()}
+                {this.renderContactScreen()}
             </View>
         );
     }
@@ -152,6 +158,16 @@ const styles = {
         color: 'white',
         paddingLeft: (Platform.OS === 'ios') ? 0 : 15,
     },
+    errorContainerStyle: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent:'center'
+    },
+    errorButtonContainerStyle: {
+        flexDirection:'row',
+        alignItems:'center',
+        justifyContent:'center'
+    },
     errorButtonStyle: {
         backgroundColor: '#FF6F00',
         alignItems: 'center'
@@ -159,6 +175,54 @@ const styles = {
     errorButtonTextStyle: {
         color: 'white'
     },
+    errorTextStyle: {
+        textAlign:"center",
+        fontSize: 16,
+        padding: 18
+    },
+    listItemContainerStyle: {
+        flexDirection: 'row',
+        paddingLeft: 15,
+        paddingRight: 15,
+        alignItems: 'center',
+        backgroundColor: 'white',
+        paddingTop: 15,
+        paddingBottom: 15,
+        borderBottomWidth:1,
+        borderColor:"rgba(51,51,51,0.2)"
+    },
+    listAvatarContainerStyle: {
+        width: 50,
+        height: 50,
+        backgroundColor: 'black',
+        borderRadius: 25,
+        backgroundColor: '#FF6F00',
+        alignItems: 'center',
+        justifyContent:'center'
+    },
+    avatarStyle: {
+        color: 'white',
+        fontSize: 18
+    },
+    contactTextStyle: {
+        marginLeft: 15,
+        fontSize: 16,
+        opacity: 0.8
+    },
+    loadingContainerStyle: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent:'center'
+    },
+    inputContainerStyle: {
+        flex: 1,
+        marginTop: 15
+    },
+    itemContainerStyle: {
+        marginLeft: 15,
+        marginRight: 15,
+        marginBottom: 15
+    }
 }
 
 export default Share;
