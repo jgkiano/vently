@@ -4,6 +4,7 @@ import { TabNavigator, StackNavigator } from 'react-navigation';
 import { Icon } from 'native-base';
 
 //screens
+import SplashScreen from './screens/Splash';
 import WelcomeScreen from './screens/Welcome';
 import LoginScreen from './screens/Login';
 import RegisterScreen from './screens/Register';
@@ -19,34 +20,19 @@ import PayScreen from './screens/Pay';
 import SingleTicketScreen from './screens/Ticket';
 import ShareTicketScreen from './screens/Share';
 
-
 const MainNavigator = TabNavigator({
 
-        profile: { screen: ProfileScreen },
+    splash: { screen: SplashScreen },
 
-        tickets: { screen: StackNavigator({
-            list: { screen: TicketScreen, navigationOptions: {
-                headerStyle: {
-                    backgroundColor: '#FF6F00',
-                },
-            } },
-            single: { screen: SingleTicketScreen, navigationOptions: {
-                headerStyle: {
-                    backgroundColor: '#FF6F00',
-                },
-            } },
-            share: { screen: ShareTicketScreen, navigationOptions: {
-                headerStyle: {
-                    backgroundColor: '#FF6F00',
-                },
-            } }
-        }, {
-            cardStyle: {
-                borderTopWidth: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
-                borderColor: "#FF6F00"
-            }
-        }) },
+    welcome: { screen: WelcomeScreen },
 
+    login: { screen: LoginScreen },
+
+    register: { screen: RegisterScreen },
+
+    interests: { screen: InterestsScreen },
+
+    mainApp: { screen: TabNavigator({
 
 
         feed: { screen: StackNavigator({
@@ -74,11 +60,38 @@ const MainNavigator = TabNavigator({
             }
         })},
 
+        tickets: { screen: StackNavigator({
+            list: { screen: TicketScreen, navigationOptions: {
+                headerStyle: {
+                    backgroundColor: '#FF6F00',
+                },
+            } },
+            single: { screen: SingleTicketScreen, navigationOptions: {
+                headerStyle: {
+                    backgroundColor: '#FF6F00',
+                },
+            } },
+            share: { screen: ShareTicketScreen, navigationOptions: {
+                headerStyle: {
+                    backgroundColor: '#FF6F00',
+                },
+            } }
+        }, {
+            cardStyle: {
+                borderTopWidth: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
+                borderColor: "#FF6F00"
+            }
+        }) },
 
+        profile: { screen: ProfileScreen },
 
-
-
-        settings: { screen: SettingsScreen },
+        settings: { screen: StackNavigator({
+            options: { screen: SettingsScreen, navigationOptions: {
+                headerStyle: {
+                    backgroundColor: '#FF6F00',
+                },
+            } },
+        }) },
 
     }, {
         navigationOptions: {
@@ -103,90 +116,18 @@ const MainNavigator = TabNavigator({
         swipeEnabled: true,
         animationEnabled: true,
 
+})},
+
+
+
+
+}, {
+    navigationOptions: {
+        tabBarVisible: false
+    },
+    swipeEnabled: false,
+    animationEnabled: false,
 });
-
-
-
-
-// const MainNavigator = TabNavigator({
-//
-//     welcome: { screen: WelcomeScreen },
-//
-//     login: { screen: LoginScreen },
-//
-//     register: { screen: RegisterScreen },
-//
-//     interests: { screen: InterestsScreen },
-//
-//     mainApp: { screen: TabNavigator({
-//
-//
-//         feed: { screen: StackNavigator({
-//
-//             feed: { screen: EventFeedScreen, navigationOptions: {
-//                 headerStyle: {
-//                     backgroundColor: '#FF6F00',
-//                 },
-//             }},
-//             map: { screen: MapScreen, navigationOptions: {
-//                 headerStyle: {
-//                     backgroundColor: '#FF6F00',
-//                 },
-//             }},
-//             singleEvent: { screen: SingleEventScreen },
-//             pay: { screen: PayScreen, navigationOptions: {
-//                 headerStyle: {
-//                     backgroundColor: '#FF6F00',
-//                 },
-//             }},
-//         }, {
-//             cardStyle: {
-//                 borderTopWidth: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
-//                 borderColor: "#FF6F00"
-//             }
-//         })},
-//
-//         tickets: { screen: TicketScreen },
-//
-//         profile: { screen: ProfileScreen },
-//
-//         settings: { screen: SettingsScreen },
-//
-//     }, {
-//         navigationOptions: {
-//             tabBarVisible: true,
-//         },
-//         tabBarOptions: {
-//             activeTintColor: '#FF6F00',
-//             inactiveTintColor: '#e0e0e0',
-//             showLabel: false,
-//             labelStyle: {
-//                 fontSize: 16,
-//             },
-//             style: {
-//                 backgroundColor: 'white',
-//             },
-//             showIcon: true,
-//             indicatorStyle: {
-//                 backgroundColor: '#FF6F00',
-//             }
-//         },
-//         tabBarPosition: 'bottom',
-//         swipeEnabled: true,
-//         animationEnabled: true,
-//
-//     })},
-//
-//
-//
-//
-// }, {
-//     navigationOptions: {
-//         tabBarVisible: false
-//     },
-//     swipeEnabled: false,
-//     animationEnabled: false,
-// });
 
 
 

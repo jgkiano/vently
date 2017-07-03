@@ -110,7 +110,7 @@ class Profile extends Component {
                             </Item>
                         </View>
                     </View>
-                    <Button style={ buttonStyle } block warning}>
+                    <Button style={ buttonStyle } block warning>
                         <Text style={buttonTextStyle}>Update Profile</Text>
                     </Button>
                 </View>
@@ -140,12 +140,13 @@ const styles = {
         width: 150,
         height: 150,
         borderRadius: 75,
-        borderWidth: 6,
-        borderColor:'rgba(255,255,255,0.7)'
     },
     imageStyle: {
         width: 150,
-        height: 150
+        height: 150,
+        borderRadius: 75,
+        borderWidth: 6,
+        borderColor:'rgba(255,255,255,0.7)'
     },
     editButtonStyle: {
         backgroundColor:'transparent',

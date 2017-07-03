@@ -1,13 +1,132 @@
 import React, { Component } from 'react';
-import { View, Image, Text, TouchableOpacity } from 'react-native';
-import { Item, Input,Label, Icon, Button } from 'native-base';
+import { View, Image, Text, TouchableOpacity, Alert, AsyncStorage } from 'react-native';
+import { Item, Input,Label, Icon, Button, Spinner } from 'native-base';
+import axios from 'axios';
+
 
 const icon = require('../assets/images/icon.png');
 const back = require('../assets/images/back.png');
+const emailReg = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+const AUTHURL = 'http://localhost:3000/api/users/authenticate';
 
 class LoginScreen extends Component {
-    render() {
+    state = {
+        email: "",
+        pass: "",
+        errorMsg: "",
+        emailError: false,
+        passError: false,
+        loading: false
+    }
 
+    validateEntry = () => {
+        this.setState({
+            errorMsg: "",
+            emailError: false,
+            passError: false
+        });
+        const {
+            email,
+            pass,
+            emailError,
+            passError
+        } = this.state;
+        if (email === "" && pass === "") {
+            this.setState({
+                errorMsg: "Please provide both an email address and password",
+                emailError: true,
+                passError: true
+            });
+            return;
+        }
+        if (email === "" || !emailReg.test(email)) {
+            this.setState({
+                errorMsg: "Please provide a valid email address",
+                emailError: true
+            });
+            return;
+        }
+        if(!emailError && !passError) {
+            this.loginUser();
+        }
+    }
+
+    setError = errorMsg => this.setState({errorMsg, loading: false });
+
+    loginUser = async () => {
+        try {
+            this.setState({loading: true});
+            const {data} = await axios.post(AUTHURL, {
+                email: this.state.email,
+                password: this.state.pass,
+            });
+            if(data.success && data.token) {
+                this.saveUser(data.token);
+            } else {
+                this.setError('Something went wrong');
+            }
+        } catch ({ request, response }) {
+            if(response && response.status === 500) {
+                this.setError(response.data.message);
+                return;
+            }
+            //probably network fail
+            if(request._response) {
+                Alert.alert(
+                    'Could not connected to vently',
+                    'We\'re having a bit of trouble accessing our servers. check your internet connection and try again',
+                    [
+                        {text: 'Cancel', onPress: () => this.setState({loading: false}), style: 'cancel'},
+                        {text: 'Try Again', onPress: () => this.loginUser()},
+                    ],
+                    { cancelable: true }
+                )
+                return;
+            }
+        }
+    }
+
+    saveUser = async (token) => {
+        try {
+            await AsyncStorage.setItem('token', token);
+            this.setState({loading: false});
+            this.props.navigation.navigate('interests', {token});
+        } catch (error) {
+            Alert.alert(
+                'Something went wrong',
+                'We can\'t access the local phone storage. Please chack your app permissions and trye again',
+                [
+                    {text: 'Cancel', onPress: () => console.log('canceled'), style: 'cancel'},
+                    {text: 'Try Again', onPress: () => this.saveUser(token, user)},
+                ],
+                { cancelable: true }
+            )
+        }
+    }
+
+    renderErrorText = () => {
+        if (this.state.errorMsg !== "") {
+            return(
+                <Text style={{marginTop: 15, marginBottom: -15, fontSize: 16, color: '#d50000'}}>{this.state.errorMsg}</Text>
+            );
+        }
+        return;
+    }
+
+    renderLoginSpinner = () => {
+        const {
+            buttonTextStyle
+        } = styles;
+        if (this.state.loading) {
+            return <Spinner color="white" />;
+        }
+        return(
+            <Text style={buttonTextStyle}>Login</Text>
+        );
+    }
+
+    render() {
         const {
             mainContainerStyle,
             imageContainerStyle,
@@ -28,17 +147,18 @@ class LoginScreen extends Component {
                 </View>
                 <View style={formContainerStyle}>
                     <Label style={labelStyle}>REQUIRED</Label>
-                    <Item>
+                    <Item error={this.state.emailError}>
                         <Icon style={inputIconStyle}active name='mail' />
-                        <Input placeholder="Email Address" />
+                        <Input disabled={this.state.loading} autoCapitalize="none" autoCorrect={false} value={this.state.email} onChangeText={email => this.setState({email})} placeholder="Email Address" />
                     </Item>
                     <Label style={labelStyle}>REQUIRED</Label>
-                    <Item>
+                    <Item error={this.state.passError}>
                         <Icon style={inputIconStyle}active name='lock' />
-                        <Input placeholder="Password" />
+                        <Input disabled={this.state.loading} secureTextEntry={true} value={this.state.pass} onChangeText={pass => this.setState({pass})} placeholder="Password" />
                     </Item>
-                    <Button style={ buttonStyle } block warning>
-                        <Text style={buttonTextStyle}>Login</Text>
+                    {this.renderErrorText()}
+                    <Button style={ buttonStyle } block warning onPress={() => this.validateEntry()}>
+                        {this.renderLoginSpinner()}
                     </Button>
                 </View>
                 <View style={signUpLinkContainer}>
@@ -91,7 +211,7 @@ const styles = {
     signUpLinkContainer: {
         flex:1,
         alignItems: 'center',
-        marginTop:15,
+        marginTop:30,
         justifyContent:'flex-start'
     },
     signUpLinkTextStyle: {
