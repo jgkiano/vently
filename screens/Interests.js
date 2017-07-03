@@ -1,96 +1,30 @@
 import React, { Component } from 'react';
-import { View, Text, TouchableOpacity, Dimensions, ScrollView, Image, LayoutAnimation, UIManager } from 'react-native';
-import { Button } from 'native-base';
+import { View, Text, Alert, TouchableOpacity, Dimensions, ScrollView, Image, LayoutAnimation, UIManager } from 'react-native';
+import { Button, Spinner } from 'native-base';
+import axios from 'axios';
 
 //get screen width
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
-//temporary icons
-const musicIcon         = require('../assets/icons/interests/music.png');
-const airplaneIcon      = require('../assets/icons/interests/airplane.png');
-const atomIcon          = require('../assets/icons/interests/atomic.png');
-const babyIcon          = require('../assets/icons/interests/baby.png');
-const charityIcon       = require('../assets/icons/interests/charity.png');
-const communityIcon     = require('../assets/icons/interests/community.png');
-const electionsIcon     = require('../assets/icons/interests/elections.png');
-const footballIcon      = require('../assets/icons/interests/football.png');
-const idIcon            = require('../assets/icons/interests/id.png');
-const movieIcon         = require('../assets/icons/interests/movie.png');
-const playIcon          = require('../assets/icons/interests/play.png');
-const prayIcon          = require('../assets/icons/interests/praying.png');
+const INTERESTURL = 'http://localhost:3000/api/interests';
 
-//tenporary data
-const DATA = {
-    interests: [
-        {
-            id: 0,
-            name: "Music",
-            icon: musicIcon
-        },
-        {
-            id: 1,
-            name: "Travel",
-            icon: airplaneIcon
-        },
-        {
-            id: 2,
-            name: "Science & Tech",
-            icon: atomIcon
-        },
-        {
-            id: 3,
-            name: "Education",
-            icon: babyIcon
-        },
-        {
-            id: 4,
-            name: "Charity",
-            icon: charityIcon
-        },
-        {
-            id: 5,
-            name: "Community",
-            icon: communityIcon
-        },
-        {
-            id: 6,
-            name: "Government",
-            icon: electionsIcon
-        },
-        {
-            id: 7,
-            name: "Sports",
-            icon: footballIcon
-        },
-        {
-            id: 8,
-            name: "Business",
-            icon: idIcon
-        },
-        {
-            id: 9,
-            name: "Movies",
-            icon: movieIcon
-        },
-        {
-            id: 10,
-            name: "The Arts",
-            icon: playIcon
-        },
-        {
-            id: 11,
-            name: "Spirituality",
-            icon: prayIcon
-        }
-    ]
-};
+const USERSINTEREST = 'http://localhost:3000/api/users/interests';
 
 class Interests extends Component {
+    //default component level state
+    state = {
+        loading: true,
+        data: [],
+        progress: 0,
+        interests: [],
+        saving: false
+    }
 
     componentDidMount() {
         //poor android
         UIManager.setLayoutAnimationEnabledExperimental &&
         UIManager.setLayoutAnimationEnabledExperimental(true);
+        this.getInterests();
     }
 
     //nice spring animation
@@ -98,18 +32,48 @@ class Interests extends Component {
         LayoutAnimation.spring();
     }
 
-    //default component level state
-    state = {
-        progress: 0,
-        interests: []
-    };
-
-    //render border of selected tile
-    renderBorder(id) {
-        if(this.state.interests.indexOf(id) > -1) {
-            return styles.selectedInterestStyle;
+    getInterests = async () => {
+        try {
+            const {data} = await axios.get(INTERESTURL);
+            this.setState({ data: data.interests, loading: false });
+        } catch (error) {
+            Alert.alert(
+                'Could not connected to vently',
+                'We\'re having a bit of trouble accessing our servers. check your internet connection and try again',
+                [
+                    {text: 'Cancel', onPress: () => console.log('canceled') , style: 'cancel'},
+                    {text: 'Try Again', onPress: () => this.getInterests()},
+                ],
+                { cancelable: true }
+            );
         }
-        return;
+    }
+
+    saveInterests = async () => {
+        const { state } = this.props.navigation;
+        const token = state.params.token;
+        this.setState({saving: true});
+        try {
+            const { data } = await axios.put(
+                USERSINTEREST,
+                { interests: this.state.interests },
+                {
+                    headers: { Authorization: token }
+                }
+            );
+            this.props.navigation.navigate('mainApp');
+        } catch (error) {
+            this.setState({saving: false});
+            Alert.alert(
+                'Could not connected to vently',
+                'We\'re having a bit of trouble accessing our servers. check your internet connection and try again',
+                [
+                    {text: 'Cancel', onPress: () => console.log('canceled') , style: 'cancel'},
+                    {text: 'Try Again', onPress: () => this.saveInterests()},
+                ],
+                { cancelable: true }
+            );
+        }
     }
 
     //determine progress as user taps
@@ -121,7 +85,6 @@ class Interests extends Component {
                 progress: this.state.progress + 0.2,
                 interests
             });
-            console.log(this.state.interests)
         } else {
             let interests = this.state.interests;
             interests.splice(interests.indexOf(id), 1);
@@ -129,24 +92,31 @@ class Interests extends Component {
                 progress: this.state.progress - 0.2,
                 interests
             });
-            console.log(this.state.interests)
         }
     }
 
+    //render border of selected tile
+    renderBorder = (id) => {
+        if(this.state.interests.indexOf(id) > -1) {
+            return styles.selectedInterestStyle;
+        }
+        return;
+    }
+
     //render the different tiles
-    renderInterests() {
+    renderInterests = () => {
         const {
             interestGridStyle,
             interestContainerStyle,
             interestIconStyle,
             interestTextStyle
         } = styles;
-        return DATA.interests.map((interest) => {
+        return this.state.data.map((interest) => {
             return (
-                <TouchableOpacity onPress={() => {this.renderProgress(interest.id)}} key={interest.id}>
+                <TouchableOpacity onPress={() => {this.renderProgress(interest._id)}} key={interest._id}>
                     <View style={ interestGridStyle }>
-                        <View style={[ interestContainerStyle , this.renderBorder(interest.id)]}>
-                            <Image source={interest.icon} style={ interestIconStyle } />
+                        <View style={[ interestContainerStyle , this.renderBorder(interest._id)]}>
+                            <Image source={{uri: interest.icon}} style={ interestIconStyle } />
                             <Text style={ interestTextStyle }>{interest.name}</Text>
                         </View>
                     </View>
@@ -155,18 +125,42 @@ class Interests extends Component {
         });
     }
 
+    renderBottomSection = () => {
+        const {scrollContainerStyle, scrollViewStyle } = styles;
+        if(this.state.loading) {
+            return(
+                <View style={{flex: 2, backgroundColor:'#eeeeee', justifyContent: 'center', alignItems: 'center'}}>
+                    <Spinner color="#FF6F00" />
+                </View>
+            );
+        }
+        return (
+            <View style={ scrollContainerStyle }>
+                <ScrollView contentContainerStyle={ scrollViewStyle }>
+                    {this.renderInterests()}
+                </ScrollView>
+            </View>
+        );
+    }
+
+    renderButtonContent = () => {
+        if(this.state.saving) {
+            return <Spinner color='white' />;
+        }
+        return <Text style={ styles.buttonTextStyle }>You are all set. Start Your Adventure</Text>;
+    }
+
     //if user has selected 5 or more interests, show continue button
-    renderContinueButton() {
+    renderContinueButton = () => {
         const {
             buttonStyleContainer,
             buttonStyle,
-            buttonTextStyle
         } = styles;
         if( this.state.interests.length >= 5) {
             return(
                 <View style={ buttonStyleContainer }>
-                    <Button onPress={() => this.props.navigation.navigate('mainApp') } style={ buttonStyle }>
-                        <Text style={ buttonTextStyle }>You're all set! Start Your Adventure</Text>
+                    <Button onPress={() => this.saveInterests() } style={ buttonStyle }>
+                        {this.renderButtonContent()}
                     </Button>
                 </View>
             );
@@ -175,9 +169,6 @@ class Interests extends Component {
     }
 
     render() {
-        if(this.props.navigation.state.params) {
-            console.log("-->",this.props.navigation.state.params.user,"<--");
-        }
         const {
             mainContainerStyle,
             heroMessageContainerStyle,
@@ -200,11 +191,7 @@ class Interests extends Component {
                 <View style={ progressContainerStyle }>
                     <View style={ [ progressStyle, { width: SCREEN_WIDTH * this.state.progress } ] } />
                 </View>
-                <View style={ scrollContainerStyle }>
-                    <ScrollView contentContainerStyle={ scrollViewStyle }>
-                        {this.renderInterests()}
-                    </ScrollView>
-                </View>
+                {this.renderBottomSection()}
             </View>
         );
     }
@@ -283,7 +270,10 @@ const styles = {
         height: 50
     },
     interestTextStyle: {
-        marginTop: 6
+        marginTop: 6,
+        paddingLeft: 2,
+        paddingRight: 2,
+        textAlign: 'center'
     },
     selectedInterestStyle: {
         borderWidth: 4,

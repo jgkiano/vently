@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, Text, StatusBar, Image, Dimensions, FlatList, List, TouchableOpacity, TouchableWithoutFeedback, Platform } from 'react-native';
-import { Container, Content, Card, CardItem, Thumbnail, Button, Icon, Left, Body } from 'native-base';
+import { Container, Content, Card, CardItem, Thumbnail, Button, Icon, Left, Body, Spinner } from 'native-base';
 
 import Share, {ShareSheet} from 'react-native-share';
 
@@ -63,7 +63,14 @@ const DATA = [
 class Feed extends Component {
 
     state = {
-        savedEvents: []
+        savedEvents: [],
+        loading: true
+    }
+
+    componentDidMount() {
+        if(this.state.loading) {
+            return <Spinner color="#FF6F00" />;
+        }
     }
 
     static navigationOptions = ({ navigation }) => ({

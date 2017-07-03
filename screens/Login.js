@@ -104,7 +104,6 @@ class LoginScreen extends Component {
             )
         }
     }
-
     renderErrorText = () => {
         if (this.state.errorMsg !== "") {
             return(
