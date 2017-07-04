@@ -126,7 +126,6 @@ class LoginScreen extends Component {
     }
 
     render() {
-        console.log(AUTHURL);
         const {
             mainContainerStyle,
             imageContainerStyle,

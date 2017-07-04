@@ -1,34 +1,41 @@
 import React, { Component } from 'react';
 import { View, Text, Image, AsyncStorage, Alert } from 'react-native';
 import { Spinner } from 'native-base';
+import { connect } from 'react-redux';
 
 const logo = require('../assets/images/splashlogo.png');
 
+import * as actions from '../actions';
+
 class Splash extends Component {
-    componentDidMount() {
-        this.getToken();
+
+    state = {
+        tryAgain: false
     }
-    getToken = async () => {
-        await AsyncStorage.removeItem('token');
-        try {
-            const token = await AsyncStorage.getItem('token');
-            if (token !== null) {
-                this.props.navigation.navigate('mainApp');
-                return;
-            }
-            this.props.navigation.navigate('welcome');
-        } catch (error) {
+
+    componentDidMount() {
+        this.props.fetchToken(this.props.navigation);
+    }
+
+    componentWillUpdate() {
+        this.props.fetchToken(this.props.navigation);
+    }
+
+    errorHandler = () => {
+        if(this.props.error) {
             Alert.alert(
                 'Error Reading Local Storage',
                 'Hey there, we are having some trouble accessing your local storage. Try again and if the problem persists contact the developers',
                 [
-                    {text: 'Try Again', onPress: () => this.getToken()},
+                    {text: 'Try Again', onPress: () => this.setState({ tryAgain: !this.state.tryAgain})},
                 ],
                 { cancelable: false }
             );
         }
     }
+
     render() {
+        {this.errorHandler()}
         return (
             <View style={{flex: 1, backgroundColor: '#FF6F00', justifyContent:'center', alignItems:'center'}}>
                 <Image source={logo} style={{width: 62, height: 162}} />
@@ -38,4 +45,8 @@ class Splash extends Component {
     }
 }
 
-export default Splash;
+function mapStateToProps({auth}) {
+    return auth;
+}
+
+export default connect(mapStateToProps, actions)(Splash);
