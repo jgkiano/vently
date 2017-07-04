@@ -1,15 +1,14 @@
 import { AsyncStorage } from 'react-native';
 
 import {
-    FETCH_TOKEN,
     FETCH_TOKEN_ERROR
 } from '../types';
 
-export const fetchToken = (navigation) => async (dispatch) => {
+export const checkToken = (navigation) => async (dispatch) => {
     try {
+        await AsyncStorage.removeItem('token');
         const token = await AsyncStorage.getItem('token');
         if(token) {
-            dispatch({ type: FETCH_TOKEN, payload: token });
             navigation.navigate('mainApp');
             return;
         }

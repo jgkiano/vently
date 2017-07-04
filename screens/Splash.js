@@ -2,10 +2,11 @@ import React, { Component } from 'react';
 import { View, Text, Image, AsyncStorage, Alert } from 'react-native';
 import { Spinner } from 'native-base';
 import { connect } from 'react-redux';
+import * as actions from '../actions';
 
 const logo = require('../assets/images/splashlogo.png');
 
-import * as actions from '../actions';
+
 
 class Splash extends Component {
 
@@ -14,11 +15,11 @@ class Splash extends Component {
     }
 
     componentDidMount() {
-        this.props.fetchToken(this.props.navigation);
+        this.props.checkToken(this.props.navigation);
     }
 
     componentWillUpdate() {
-        this.props.fetchToken(this.props.navigation);
+        this.props.checkToken(this.props.navigation);
     }
 
     errorHandler = () => {

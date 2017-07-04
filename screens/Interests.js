@@ -37,15 +37,15 @@ class Interests extends Component {
             const {data} = await axios.get(INTERESTURL);
             this.setState({ data: data.interests, loading: false });
         } catch (error) {
-            Alert.alert(
-                'Could not connected to vently',
-                'We\'re having a bit of trouble accessing our servers. check your internet connection and try again',
-                [
-                    {text: 'Cancel', onPress: () => console.log('canceled') , style: 'cancel'},
-                    {text: 'Try Again', onPress: () => this.getInterests()},
-                ],
-                { cancelable: true }
-            );
+            // Alert.alert(
+            //     'Could not connected to vently',
+            //     'We\'re having a bit of trouble accessing our servers. check your internet connection and try again',
+            //     [
+            //         {text: 'Cancel', onPress: () => console.log('canceled') , style: 'cancel'},
+            //         {text: 'Try Again', onPress: () => this.getInterests()},
+            //     ],
+            //     { cancelable: true }
+            // );
         }
     }
 
