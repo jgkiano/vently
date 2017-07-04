@@ -2,14 +2,18 @@ import Expo from 'expo';
 import React, { Component } from 'react';
 import { StyleSheet, View, StatusBar } from 'react-native';
 import MainNavigator from './router';
+import { Provider } from 'react-redux';
+import store from './store';
 
 
 class App extends Component {
     render() {
         return (
-            <View style={styles.container}>
-                <MainNavigator />
-            </View>
+            <Provider store={store}>
+                <View style={styles.container}>
+                    <MainNavigator />
+                </View>
+            </Provider>
         );
     }
 }

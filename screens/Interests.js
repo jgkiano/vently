@@ -2,13 +2,13 @@ import React, { Component } from 'react';
 import { View, Text, Alert, TouchableOpacity, Dimensions, ScrollView, Image, LayoutAnimation, UIManager } from 'react-native';
 import { Button, Spinner } from 'native-base';
 import axios from 'axios';
+import config from '../config';
 
 //get screen width
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
-const INTERESTURL = 'http://localhost:3000/api/interests';
-
-const USERSINTEREST = 'http://localhost:3000/api/users/interests';
+const INTERESTURL = config.getInterestsUrl();
+const USERSINTERESTUPDATEURL = config.getInterestsUpdateUrl();
 
 class Interests extends Component {
     //default component level state
@@ -55,7 +55,7 @@ class Interests extends Component {
         this.setState({saving: true});
         try {
             const { data } = await axios.put(
-                USERSINTEREST,
+                USERSINTERESTUPDATEURL,
                 { interests: this.state.interests },
                 {
                     headers: { Authorization: token }

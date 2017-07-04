@@ -2,13 +2,13 @@ import React, { Component } from 'react';
 import { View, Image, Text, TouchableOpacity, Alert, AsyncStorage } from 'react-native';
 import { Item, Input,Label, Icon, Button, Spinner } from 'native-base';
 import axios from 'axios';
+import config from '../config';
 
 
 const icon = require('../assets/images/icon.png');
 const back = require('../assets/images/back.png');
 const emailReg = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-const AUTHURL = 'http://localhost:3000/api/users/authenticate';
+const AUTHURL = config.getAuthUrl();
 
 class LoginScreen extends Component {
     state = {
@@ -91,7 +91,7 @@ class LoginScreen extends Component {
         try {
             await AsyncStorage.setItem('token', token);
             this.setState({loading: false});
-            this.props.navigation.navigate('interests', {token});
+            this.props.navigation.navigate('mainApp', {token});
         } catch (error) {
             Alert.alert(
                 'Something went wrong',
@@ -126,6 +126,7 @@ class LoginScreen extends Component {
     }
 
     render() {
+        console.log(AUTHURL);
         const {
             mainContainerStyle,
             imageContainerStyle,

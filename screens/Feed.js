@@ -1,76 +1,24 @@
 import React, { Component } from 'react';
-import { View, Text, StatusBar, Image, Dimensions, FlatList, List, TouchableOpacity, TouchableWithoutFeedback, Platform } from 'react-native';
+import { View, Text, AsyncStorage, StatusBar, Image, Dimensions, FlatList, List, TouchableOpacity, TouchableWithoutFeedback, Platform } from 'react-native';
 import { Container, Content, Card, CardItem, Thumbnail, Button, Icon, Left, Body, Spinner } from 'native-base';
-
+import axios from 'axios';
+import moment from 'moment';
 import Share, {ShareSheet} from 'react-native-share';
+import config from '../config';
+
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
-const DATA = [
-    {
-        id: 0,
-        banner: 'https://blog.algolia.com/wp-content/uploads/2015/12/react-native.png',
-        eventName: "React Native Essential Training",
-        date: 'June 7th',
-        from: '8 pm',
-        to: '11 pm',
-        locationName: 'Strathmore University',
-        price: 500
-    },
-    {
-        id: 1,
-        banner: 'http://lorempixel.com/1920/1080/',
-        eventName: "Burger Fest",
-        date: 'June 10th',
-        from: '7 am',
-        to: '12 pm',
-        locationName: 'Burger King',
-        price: 750
-    },
-    {
-        id: 2,
-        banner: 'http://lorempixel.com/1920/1080/',
-        eventName: "Ultimate Rap and Dance Battle",
-        date: 'May 7th',
-        from: '9 am',
-        to: '3 pm',
-        locationName: 'Lifestyle Building, 5th floor',
-        price: 350
-    },
-    {
-        id: 3,
-        banner: 'http://lorempixel.com/1920/1080/',
-        eventName: "First Person Shooter Game Tournament",
-        date: 'May 15th',
-        from: '11 am',
-        to: '9 pm',
-        locationName: 'Dev Building',
-        price: 1200
-    },
-    {
-        id: 4,
-        banner: 'http://lorempixel.com/1920/1080/',
-        eventName: "Introduction To Hacking Seminar",
-        date: 'May 20th',
-        from: '8 am',
-        to: '4 pm',
-        locationName: 'Strathmore University',
-        price: 700
-    },
-];
+const EVENTSURL = config.getEventsUrl();
 
 class Feed extends Component {
 
     state = {
+        token: null,
         savedEvents: [],
-        loading: true
-    }
-
-    componentDidMount() {
-        if(this.state.loading) {
-            return <Spinner color="#FF6F00" />;
-        }
+        loading: true,
+        data: []
     }
 
     static navigationOptions = ({ navigation }) => ({
@@ -83,6 +31,24 @@ class Feed extends Component {
             return <Icon style={{ color: tintColor }} name = 'ios-home' />;
         }
     });
+
+    getFeed = async () => {
+        const token = await AsyncStorage.getItem('token');
+        if (token) {
+            await this.setState({ token });
+            try {
+                const { data } = await axios.get(
+                    EVENTSURL,
+                    {
+                        headers: { Authorization: this.state.token }
+                    }
+                );
+                this.setState({ data: data.events, loading: false });
+            } catch (error) {
+                console.log('error');
+            }
+        }
+    }
 
 
 
@@ -115,8 +81,8 @@ class Feed extends Component {
 
     startShareEvent = (event) => {
         Share.open({
-            title: "React Native",
-            message: "Hola mundo",
+            title: event.name,
+            message: `Hey, check out ${event.name} thats happening at ${event.locationDescription}. Install Vetly to get your tickets. Download the app`,
             url: 'http://facebook.com',
             subject: "Share Link" //  for email
         }).catch((err) => { err && console.log("error->", err); })
@@ -153,14 +119,14 @@ class Feed extends Component {
                 <View>
                     <View style={eventMetaContainerStyle}>
                         <View style={dateContainerStyle}>
-                            <Text style={dateStyle}>{event.date}</Text>
+                            <Text style={dateStyle}>{moment(event.dateFrom).format('MMMM DD')}</Text>
                         </View>
                         <View style={timeConatinerStyle}>
-                            <Text style={timeStyle}>{event.from} to {event.to}</Text>
+                            <Text style={timeStyle}>{moment(event.dateFrom).format('h:hh A')} to {moment(event.dateTo).format('h:hh A')}</Text>
                         </View>
                         <View style={actionButtonsContainer}>
                             <TouchableOpacity onPress={() => { this.toggleEventSave(event.id) } }>
-                                <Icon style={ this.renderBookmark(event.id) } name='md-bookmark' />
+                                <Icon style={ this.renderBookmark(event._id) } name='md-bookmark' />
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => {this.startShareEvent(event)} }>
                                 <Icon style={shareStyle} name='share' />
@@ -169,14 +135,14 @@ class Feed extends Component {
                     </View>
                     <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('singleEvent')}>
                         <View style={eventNameContainerStyle}>
-                            <Text style={eventNameStyle}>{event.eventName}</Text>
+                            <Text style={eventNameStyle}>{event.name}</Text>
                         </View>
                     </TouchableWithoutFeedback>
                     <View style={bottomMetaContainerStyle}>
                         <View style={locationContainerStyle}>
                             <Icon style={pinStyle} name='md-pin' />
                             <TouchableOpacity onPress={() => this.props.navigation.navigate('map')}>
-                                <Text style={locationNameStyle}>{event.locationName}</Text>
+                                <Text style={locationNameStyle}>{event.locationDescription}</Text>
                             </TouchableOpacity>
                         </View>
                         <View style={priceContainerStyle}>
@@ -187,25 +153,38 @@ class Feed extends Component {
             </View>
         );
     }
+    
+    renderScreen = () => {
+        if(this.state.loading) {
+            return(
+                <View style={{flex: 1, justifyContent: 'center', alignItems:'center'}}>
+                    <Spinner color='#FF6F00' />
+                </View>
+            );
+        }
+        return(
+            <FlatList
+                data={this.state.data}
+                renderItem={ ({item}) => this.renderList(item) }
+                keyExtractor={item => item._id}
+                extraData={this.state}
+                removeClippedSubviews={false}
+            />
+        );
+    }
 
 
     render() {
+        this.getFeed();
         const {
             feedContainerStyle
         } = styles;
         return(
             <View style={feedContainerStyle}>
             <StatusBar
-            backgroundColor="blue"
             barStyle="light-content"
             />
-                <FlatList
-                    data={DATA}
-                    renderItem={ ({item}) => this.renderList(item) }
-                    keyExtractor={item => item.id}
-                    extraData={this.state}
-                    removeClippedSubviews={false}
-                />
+            {this.renderScreen()}
             </View>
         );
     }
@@ -260,7 +239,7 @@ const styles = {
         fontSize: 14
     },
     timeConatinerStyle: {
-        flex: 1,
+        flex: 2,
         justifyContent: 'center'
     },
     timeStyle: {
@@ -293,7 +272,7 @@ const styles = {
         paddingBottom: 12,
     },
     locationContainerStyle: {
-        flex: 1,
+        flex: 2,
         flexDirection: 'row'
     },
     pinStyle: {

@@ -13,10 +13,10 @@ class Splash extends Component {
         try {
             const token = await AsyncStorage.getItem('token');
             if (token !== null) {
-                this.props.navigation.navigate('mainApp', { token });
+                this.props.navigation.navigate('mainApp');
                 return;
             }
-            this.props.navigation.navigate('interests');
+            this.props.navigation.navigate('welcome');
         } catch (error) {
             Alert.alert(
                 'Error Reading Local Storage',

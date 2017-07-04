@@ -22,15 +22,15 @@ import ShareTicketScreen from './screens/Share';
 
 const MainNavigator = TabNavigator({
 
-    login: { screen: LoginScreen },
-
-    interests: { screen: InterestsScreen },
+    splash: { screen: SplashScreen },
 
     welcome: { screen: WelcomeScreen },
 
+    login: { screen: LoginScreen },
+
     register: { screen: RegisterScreen },
 
-
+    interests: { screen: InterestsScreen },
 
     mainApp: { screen: TabNavigator({
 
