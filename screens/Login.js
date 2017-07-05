@@ -13,7 +13,6 @@ class LoginScreen extends Component {
     state = {
         email: "",
         pass: "",
-        currentlyShowingError: false,
     }
 
     errorHandler = () => {

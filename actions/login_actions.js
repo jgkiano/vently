@@ -5,6 +5,7 @@ import {
     LOGIN_NETWORK_FAIL,
     LOGIN_ONLINE_VALIDATE_FAIL,
     LOADING_STATUS,
+    RECEIVE_TOKEN
 } from '../types';
 
 import config from '../config';
@@ -12,7 +13,6 @@ const AUTHURL = config.getAuthUrl();
 const emailReg = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
 export const loginUser = (email, password, navigation) => async (dispatch) => {
-    console.log("called----")
     if (email === "" && password === "") {
         dispatch({
             type: LOGIN_VALIDATE_FAIL,
@@ -57,6 +57,8 @@ export const loginUser = (email, password, navigation) => async (dispatch) => {
         const token = await getToken(email, password);
         await AsyncStorage.setItem('token', token);
         navigation.navigate('mainApp');
+        dispatch({ type: RECEIVE_TOKEN, payload: { token }});
+        return;
     } catch (error) {
         if(error.response) {
             const message = error.response.data.message;

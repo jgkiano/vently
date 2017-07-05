@@ -1,25 +1,16 @@
 import React, { Component } from 'react';
-import { View, Text, AsyncStorage, StatusBar, Image, Dimensions, FlatList, List, TouchableOpacity, TouchableWithoutFeedback, Platform } from 'react-native';
-import { Container, Content, Card, CardItem, Thumbnail, Button, Icon, Left, Body, Spinner } from 'native-base';
-import axios from 'axios';
+import { View, Text, Image, Dimensions, FlatList, TouchableOpacity, TouchableWithoutFeedback, Platform } from 'react-native';
+import { Button, Icon, Spinner } from 'native-base';
 import moment from 'moment';
 import Share, {ShareSheet} from 'react-native-share';
-import config from '../config';
 
+import { connect } from 'react-redux';
+import * as actions from '../actions';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
-const EVENTSURL = config.getEventsUrl();
-
 class Feed extends Component {
-
-    state = {
-        token: null,
-        savedEvents: [],
-        loading: true,
-        data: []
-    }
 
     static navigationOptions = ({ navigation }) => ({
         title: 'Home',
@@ -32,38 +23,12 @@ class Feed extends Component {
         }
     });
 
-    getFeed = async () => {
-        const token = await AsyncStorage.getItem('token');
-        if (token) {
-            await this.setState({ token });
-            try {
-                const { data } = await axios.get(
-                    EVENTSURL,
-                    {
-                        headers: { Authorization: this.state.token }
-                    }
-                );
-                this.setState({ data: data.events, loading: false });
-            } catch (error) {
-                console.log('error');
-            }
-        }
-    }
-
-
-
     toggleEventSave = (id) => {
-        let savedEvents = this.state.savedEvents;
+        let { savedEvents } = this.props;
         if(savedEvents.indexOf(id) > -1) {
-            savedEvents.splice(savedEvents.indexOf(id), 1);
-            this.setState({
-                savedEvents
-            });
+            this.props.removeEvent(id);
         } else {
-            savedEvents.push(id);
-            this.setState({
-                savedEvents
-            });
+            this.props.saveEvent(id);
         }
     }
 
@@ -72,12 +37,11 @@ class Feed extends Component {
             activeBookmark,
             inactiveBookmark
         } = styles;
-        if(this.state.savedEvents.indexOf(id) > -1) {
+        if(this.props.savedEvents.indexOf(id) > -1) {
             return activeBookmark;
         }
         return inactiveBookmark;
     }
-
 
     startShareEvent = (event) => {
         Share.open({
@@ -88,7 +52,7 @@ class Feed extends Component {
         }).catch((err) => { err && console.log("error->", err); })
     }
 
-    renderList = (event) => {
+    renderItem = (event) => {
         const {
             cardContainerStyle,
             cardImageStyle,
@@ -125,7 +89,7 @@ class Feed extends Component {
                             <Text style={timeStyle}>{moment(event.dateFrom).format('h:hh A')} to {moment(event.dateTo).format('h:hh A')}</Text>
                         </View>
                         <View style={actionButtonsContainer}>
-                            <TouchableOpacity onPress={() => { this.toggleEventSave(event.id) } }>
+                            <TouchableOpacity onPress={() => { this.toggleEventSave(event._id) } }>
                                 <Icon style={ this.renderBookmark(event._id) } name='md-bookmark' />
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => {this.startShareEvent(event)} }>
@@ -153,9 +117,10 @@ class Feed extends Component {
             </View>
         );
     }
-    
+
     renderScreen = () => {
-        if(this.state.loading) {
+        if(this.props.feed.length === 0) {
+            this.props.getEventFeed(this.props.token);
             return(
                 <View style={{flex: 1, justifyContent: 'center', alignItems:'center'}}>
                     <Spinner color='#FF6F00' />
@@ -164,27 +129,22 @@ class Feed extends Component {
         }
         return(
             <FlatList
-                data={this.state.data}
-                renderItem={ ({item}) => this.renderList(item) }
+                data={this.props.feed}
+                renderItem={ ({item}) => this.renderItem(item) }
                 keyExtractor={item => item._id}
-                extraData={this.state}
+                extraData={this.props}
                 removeClippedSubviews={false}
             />
         );
     }
 
-
     render() {
-        this.getFeed();
         const {
             feedContainerStyle
         } = styles;
         return(
             <View style={feedContainerStyle}>
-            <StatusBar
-            barStyle="light-content"
-            />
-            {this.renderScreen()}
+                {this.renderScreen()}
             </View>
         );
     }
@@ -300,4 +260,8 @@ const styles = {
     }
 };
 
-export default Feed;
+function mapStateToProps({events}) {
+    return events;
+}
+
+export default connect(mapStateToProps, actions)(Feed);
