@@ -36,7 +36,8 @@ export const goToSingleTicket = (ticketInfo, token, navigation) => async (dispat
             type: GET_SINGLE_TICKET,
             payload: {
                 data,
-                totalTickets: ticketInfo.totalTickets
+                totalTickets: ticketInfo.totalTickets,
+                token
             }
         })
     }

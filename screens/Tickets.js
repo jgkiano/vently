@@ -57,7 +57,6 @@ class Tickets extends Component {
     };
 
     renderItem = (ticketInfo) => {
-        console.log(ticketInfo);
         if (Platform.OS ==='android') {
             return(
                 <TouchableNativeFeedback onPress={() => this.props.goToSingleTicket({

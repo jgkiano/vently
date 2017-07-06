@@ -5,6 +5,9 @@ import Expo from 'expo';
 import _ from 'lodash';
 import { BackButton } from '../components';
 
+import { connect } from 'react-redux';
+import * as actions from '../actions';
+
 
 class Share extends Component {
     state = {
@@ -12,6 +15,7 @@ class Share extends Component {
         permissionGranted: null,
         contacts: null,
         hasUserStartedTyping: false,
+        shareInfo: null,
     }
 
     static navigationOptions = ({ navigation }) => ({
@@ -54,9 +58,19 @@ class Share extends Component {
     contactPressed = (contact) => {
         Alert.alert(
             `Share ticket with ${contact.name}`,
-            `Are you sure you'd like to share this ticket with ${contact.name}, phone number: ${contact.phoneNumbers[0].number}?`,
+            `Are you sure you'd like to share this ticket with ${contact.name}, phone number: ${contact.phoneNumbers[0].number}? You'll have ${this.props.totalTickets - 1} left`,
             [
-                {text: 'Share Ticket', onPress: () => console.log('Ask me later pressed')},
+                {text: 'Share Ticket', onPress: () => {this.props.shareTicket({
+                    eventId: this.props.data.eventId._id,
+                    user: contact.phoneNumbers[0].number,
+                    name: contact.name
+                }, this.props.navigation, this.props.token)
+                this.setState({
+                    shareInfo: {
+                        name: contact.name
+                    }
+                })
+            }},
                 {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
             ],
             { cancelable: false }
@@ -130,6 +144,14 @@ class Share extends Component {
                             <Text style={errorButtonTextStyle}>Grant Permission</Text>
                         </Button>
                     </View>
+                </View>
+            );
+        }
+        if(this.state.shareInfo) {
+            return (
+                <View style={{flex:1, alignItems: 'center', justifyContent: 'center'}}>
+                    <Text style={{fontSize: 24, fontWeight:'bold', textAlign: 'center', color:'#FF6F00', paddingHorizontal: 32}}>Sharing ticket with {this.state.shareInfo.name}</Text>
+                    <Spinner color="white" />
                 </View>
             );
         }
@@ -227,4 +249,8 @@ const styles = {
     }
 }
 
-export default Share;
+function mapStateToProps({ singleTicket }) {
+    return singleTicket;
+}
+
+export default connect(mapStateToProps, actions)(Share);

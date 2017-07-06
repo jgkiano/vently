@@ -7,3 +7,5 @@ export * from './events_actions';
 export * from './single_event_actions';
 
 export * from './ticket_actions';
+
+export * from './share_actions';

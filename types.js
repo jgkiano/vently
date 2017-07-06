@@ -18,3 +18,5 @@ export const DEFAULT_TICKET_STATE = 'default_ticketState';
 export const GET_TICKETS = 'get_tickets';
 
 export const GET_SINGLE_TICKET = 'get_single_ticket';
+
+export const SHARE_TICKET = 'share_ticket';

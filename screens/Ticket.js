@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { View, Text, Platform, TouchableOpacity, Dimensions, Image, TouchableHighlight, Modal } from 'react-native';
-import { Icon, Button, Badge, Spinner } from 'native-base';
+import { View, Text, Platform, TouchableOpacity, Dimensions, Image, TouchableHighlight } from 'react-native';
+import { Icon, Button, Spinner } from 'native-base';
 import moment from 'moment';
 import { BackButton } from '../components';
 import QRCode from 'react-native-qrcode';
@@ -21,9 +21,7 @@ class SingleTicket extends Component {
         tabBarIcon: ({ tintColor }) => {
             return <Icon style={{ color: tintColor }} name = 'md-pricetags' />;
         },
-        headerRight: <TouchableOpacity
-            onPress={() => {navigation.navigate('share')}}
-            ><Icon style={styles.planeIconStyle} name='md-paper-plane' /></TouchableOpacity>,
+        headerRight: <TouchableOpacity onPress={() => navigation.navigate('share')}><Icon style={styles.planeIconStyle} name='md-paper-plane' /></TouchableOpacity>,
         headerLeft: <BackButton back={navigation.goBack}/>
     });
 
@@ -125,6 +123,7 @@ class SingleTicket extends Component {
             );
         }
         const { banner } = this.props.data.eventId;
+
         return(
             <View style={{flex: 1, width: SCREEN_WIDTH}}>
                 <View style={ticketContainerStyle}>
@@ -140,7 +139,6 @@ class SingleTicket extends Component {
             </View>
         );
     }
-
     render() {
         return (
             <View style={{flex: 1}}>

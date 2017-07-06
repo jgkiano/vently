@@ -27,6 +27,9 @@ const config = {
     },
     getSingleTicketUrl(id) {
         return `${this.getPrefix()}/api/tickets/${id}`
+    },
+    getTicketShareUrl() {
+        return `${this.getPrefix()}/api/tickets/`
     }
 }
 
