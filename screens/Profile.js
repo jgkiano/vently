@@ -169,11 +169,7 @@ const styles = {
     labelStyle: {
         fontSize: 12,
         color: '#FF6F00',
-    },
-    privacyStyle: {
-        padding: 20,
-        textAlign: 'center',
-        opacity: 0.7
+        textAlign:'left',
     },
     inputRowContainerStyle:{
         marginBottom: 4,

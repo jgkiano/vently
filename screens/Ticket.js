@@ -138,7 +138,7 @@ const styles = {
     leftTicketCircleStyle: {
         width: 40,
         height: 40,
-        backgroundColor:'#E6E5ED',
+        backgroundColor:'#E9E9EF',
         position: 'absolute',
         top: "50%",
         transform:[{translateY: -20},{translateX: -20}],
@@ -148,7 +148,7 @@ const styles = {
     rightTicketCircleStyle: {
         width: 40,
         height: 40,
-        backgroundColor:'#E6E5ED',
+        backgroundColor:'#E9E9EF',
         position: 'absolute',
         right: 0,
         top: "50%",
