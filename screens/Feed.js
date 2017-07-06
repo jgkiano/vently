@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Image, Dimensions, FlatList, TouchableOpacity, TouchableWithoutFeedback, Platform } from 'react-native';
+import { View, Text, Image, Alert, Dimensions, FlatList, TouchableOpacity, TouchableWithoutFeedback, Platform } from 'react-native';
 import { Button, Icon, Spinner } from 'native-base';
 import moment from 'moment';
 import Share, {ShareSheet} from 'react-native-share';
@@ -74,7 +74,7 @@ class Feed extends Component {
         } = styles;
         return (
             <View style={cardContainerStyle}>
-                <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('singleEvent')}>
+                <TouchableWithoutFeedback onPress={() => this.props.goToEvent(event._id, this.props.navigation, this.props.token)}>
                     <Image
                         style={cardImageStyle}
                         source={{uri: event.banner}}

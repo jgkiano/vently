@@ -1,6 +1,6 @@
 import { Platform } from 'react-native';
 const config = {
-    currentIp: '192.168.1.101',
+    currentIp: '192.168.1.100',
     getPrefix() {
         if(Platform.OS==='ios') {
             return 'http://localhost:3000';
@@ -18,6 +18,9 @@ const config = {
     },
     getEventsUrl() {
         return `${this.getPrefix()}/api/events`;
+    },
+    getSingleEventUrl(id, coords = null) {
+        return ( coords ) ? `${this.getPrefix()}/api/events/${id}?lat=${coords.latitude}&lng=${coords.longitude}` : `${this.getPrefix()}/api/events/${id}`;
     }
 }
 

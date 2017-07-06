@@ -9,3 +9,8 @@ export const GET_EVENT_FEED = 'get_event_feed';
 export const RECEIVE_TOKEN = 'receive_token';
 export const SAVE_EVENT = 'save_event';
 export const REMOVE_EVENT = 'remove_event';
+export const NAVIGATE_SINGLE = 'navigate_single';
+
+export const GET_EVENT_INFO = 'get_event_info';
+export const TICKET_CHANGE = 'ticket_change';
+export const DEFAULT_TICKET_STATE = 'default_ticketState';

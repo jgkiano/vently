@@ -8,7 +8,7 @@ import {
 const INITIAL_STATE = {
     token: null,
     feed: [],
-    savedEvents: []
+    savedEvents: [],
 }
 
 export default function (state = INITIAL_STATE, action) {

@@ -1,45 +1,18 @@
 import React, { Component } from 'react';
 import { View, Text, Image, Dimensions, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import { Icon, Button } from 'native-base';
-import { BackButton } from '../components';
+import { Icon, Button, Spinner } from 'native-base';
+import moment from 'moment';
 import { MapView } from 'expo';
+import { connect } from 'react-redux';
+import * as actions from '../actions';
+import { BackButton } from '../components';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
-
 const camera = require('../assets/images/camera.png');
-
 const LONG_DELTA = 0.0094;
 const LAT_DELTA = 0.0139;
 
-const MINIMUM_NUMBER_OF_TICKETS = 1;
-const MAXIMUM_NUMBER_OF_TICKETS = 3;
-
-const DATA = {
-    id: 0,
-    eventName: 'React Native Essential Training',
-    banner: 'https://blog.algolia.com/wp-content/uploads/2015/12/react-native.png',
-    locationDesc: 'Strathmore University',
-    time: 'Wed, Nov 29, 8:00AM - 4:00PM',
-    distance: '2hrs',
-    weather: 'Partly Cloudy',
-    eventDesc: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-    locationRegion: {
-        latitude: -1.3100821,
-        longitude: 36.8103461,
-        longitudeDelta: LONG_DELTA,
-        latitudeDelta: LAT_DELTA
-    },
-    ticketPrice: 500
-}
-
 class Single extends Component {
-
-    state = {
-        pricePerTicket: DATA.ticketPrice,
-        total: DATA.ticketPrice,
-        tickets: 1,
-        liked: false
-    }
 
     static navigationOptions = ({ navigation }) => ({
         title: 'React Native Essential Training',
@@ -58,33 +31,37 @@ class Single extends Component {
         headerRight: <TouchableOpacity><Icon style={{marginRight: 15, color: 'white'}} name='md-star-outline' /></TouchableOpacity>,
     });
 
-    ticketCalculator = async (op) => {
-        await this.setState({
-            tickets: op == 'add' ? this.state.tickets + 1: this.state.tickets - 1
-        }, async () => {
-            if(this.state.tickets > MAXIMUM_NUMBER_OF_TICKETS) {
-                await this.setState({ tickets: MAXIMUM_NUMBER_OF_TICKETS });
-            }
-            if(this.state.tickets < MINIMUM_NUMBER_OF_TICKETS) {
-                await this.setState({ tickets: MINIMUM_NUMBER_OF_TICKETS });
-            }
-            await this.setState({
-                total: this.state.tickets * this.state.pricePerTicket
-            });
-        });
-    };
-
     confirmOrder = () => {
+        const order = {
+            eventId: this.props.data._id,
+            tickets: this.props.tickets,
+            total: this.props.ticketPrice,
+            user: this.props.token
+        };
         Alert.alert(
             'Almost there!',
-            `You\'re almost done. We need you to confirm your order for ${this.state.tickets} ticket(s) for ${DATA.eventName} at KES ${this.state.total}`,
+            `You\'re almost done. We need you to confirm your order for ${order.tickets} ticket(s) for ${this.props.data.name} at KES ${order.total}`,
             [
-                {text: 'Confirm', onPress: () => this.props.navigation.navigate('pay') },
+                {text: 'Confirm', onPress: () => this.props.placeOrder(order, this.props.navigation)},
                 {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
             ],
             { cancelable: false }
         )
     };
+
+    formatTime = () => {
+        if(this.props.data) {
+            const dateFrom = moment(this.props.data.dateFrom);
+            const dateTo = moment(this.props.data.dateTo);
+            const diff = dateTo.diff(dateFrom,'days');
+            if (diff === 0) {
+                return `${moment(dateFrom).format('dddd')}, ${moment(dateFrom).format('MMM Do h:mm a')} - ${moment(dateTo).format('h:mm a')}`;
+            } else {
+                return `${moment(dateFrom).format('dddd')}, ${moment(dateFrom).format('MMM Do')} - ${moment(dateTo).format('dddd')}, ${moment(dateTo).format('MMM Do')}`;
+            }
+        }
+        return "";
+    }
 
     renderTicketBuyWidget = () => {
         const {
@@ -100,16 +77,16 @@ class Single extends Component {
         return (
             <View style={ticketBuyContainerStyle}>
                 <View style={ticketBuyButtonContainerStyle}>
-                    <Button onPress={() => this.ticketCalculator()} style={ticketBuyButtonStyle} small>
+                    <Button onPress={() => this.props.ticketCalculator("sub",this.props.tickets,this.props.data.price)} style={ticketBuyButtonStyle} small>
                         <Text style={ticketBuyButtonTextStyle}>-</Text>
                     </Button>
-                    <Text style={ticketNumberTextStyle}>{this.state.tickets}</Text>
-                    <Button onPress={() => this.ticketCalculator("add") } style={ticketBuyButtonStyle} small>
+                    <Text style={ticketNumberTextStyle}>{this.props.tickets}</Text>
+                    <Button onPress={() => this.props.ticketCalculator("add",this.props.tickets,this.props.data.price) } style={ticketBuyButtonStyle} small>
                         <Text style={ticketBuyButtonTextStyle}>+</Text>
                     </Button>
                 </View>
                 <View style={ticketPriceContainer}>
-                    <Text>KES {this.state.total}</Text>
+                    <Text>KES {this.props.ticketPrice}</Text>
                 </View>
                 <View style={buyTicketButtonContainerStyle}>
                     <Button onPress={() => this.confirmOrder()} style={ticketBuyButtonStyle}>
@@ -122,82 +99,123 @@ class Single extends Component {
 
     renderMapLocation = () => {
         const {mapViewStyle} = styles;
+        const region = {
+            latitude: this.props.data.location[0],
+            longitude: this.props.data.location[1],
+            longitudeDelta: LONG_DELTA,
+            latitudeDelta: LAT_DELTA
+        }
         return (
             <MapView style={mapViewStyle}
-                initialRegion={DATA.locationRegion}
+                initialRegion={region}
                 cacheEnabled={true}
                 scrollEnabled={false}
             >
                 <MapView.Marker
-                    coordinate={{latitude: DATA.locationRegion.latitude, longitude: DATA.locationRegion.longitude}}
-                    title={DATA.locationDesc}
+                    coordinate={{latitude: this.props.data.location[0], longitude: this.props.data.location[1]}}
+                    title={this.props.data.locationDescription}
                     onCalloutPress = {() => console.log("pressed callout")}
                 />
             </MapView>
         );
     };
 
+    renderDistance = () => {
+        if(this.props.data.duration) {
+            return(
+                <View style={styles.metaContainerStyle}>
+                    <Icon style={styles.metaIconStyle} name='ios-map' />
+                    <Text style={styles.metaTextStyle}>{this.props.data.duration} away</Text>
+                </View>
+            );
+        }
+    }
+
+    renderWeather = () => {
+        if(this.props.data.weather) {
+            return(
+                <View style={styles.metaContainerStyle}>
+                    <Icon style={styles.metaIconStyle} name='ios-shirt' />
+                    <Text style={styles.metaTextStyle}>{this.props.data.weather.description}</Text>
+                </View>
+            );
+        }
+    }
 
 
-    render() {
-        console.ignoredYellowBox = ['Warning: View.propTypes'];
-        const {
-            container,
-            scrollContainerStyle,
-            heroImageContainerStyle,
-            heroImageStyle,
-            titleContainerStyle,
-            titleTextStyle,
-            metaContainerStyle,
-            metaIconStyle,
-            metaTextStyle,
-            sectionTitleStyle,
-            plainTextContainerStyle,
-            plainTextStyle,
-            timeIconStyle
-        } = styles;
+    renderScreen = () => {
+        if(this.props.data) {
+            const {
+                container,
+                scrollContainerStyle,
+                heroImageContainerStyle,
+                heroImageStyle,
+                titleContainerStyle,
+                titleTextStyle,
+                metaContainerStyle,
+                metaIconStyle,
+                metaTextStyle,
+                sectionTitleStyle,
+                plainTextContainerStyle,
+                plainTextStyle,
+                timeIconStyle
+            } = styles;
+            return (
+                <View style={container}>
+                    {this.renderTicketBuyWidget()}
+                    <ScrollView style={scrollContainerStyle}>
+                        <View style={container}>
+                            <View style={heroImageContainerStyle}>
+                                <Image source={camera} />
+                                <Image
+                                    style={heroImageStyle}
+                                    source={{uri: this.props.data.banner}}
+                                    resizeMode="cover"
+                                />
+                            </View>
+                            <View style={titleContainerStyle}>
+                                <Text style={titleTextStyle}>{this.props.data.name}</Text>
+                                <View style={metaContainerStyle}>
+                                    <Icon style={metaIconStyle} name='md-pin' />
+                                    <Text style={metaTextStyle}>{this.props.data.locationDescription}</Text>
+                                </View>
+                                <View style={metaContainerStyle}>
+                                    <Icon style={timeIconStyle} name='md-time' />
+                                    <Text style={metaTextStyle}>{this.formatTime()}</Text>
+                                </View>
+                                {this.renderDistance()}
+                                {this.renderWeather()}
+                            </View>
+                            <Text style={sectionTitleStyle}>About</Text>
+                            <View style={plainTextContainerStyle}>
+                                <Text style={plainTextStyle}>{this.props.data.description}</Text>
+                            </View>
+                            <Text style={sectionTitleStyle}>Location</Text>
+                            {this.renderMapLocation()}
+                        </View>
+                    </ScrollView>
+                </View>
+            );
+        }
+        if(this.props.eventId && !this.props.data) {
+            this.props.getEventDetailes(this.props.eventId, this.props.token);
+        }
         return (
-            <View style={container}>
-                {this.renderTicketBuyWidget()}
-                <ScrollView style={scrollContainerStyle}>
-                    <View style={container}>
-                        <View style={heroImageContainerStyle}>
-                            <Image source={camera} />
-                            <Image
-                                style={heroImageStyle}
-                                source={{uri: DATA.banner}}
-                                resizeMode="cover" />
-                        </View>
-                        <View style={titleContainerStyle}>
-                            <Text style={titleTextStyle}>{DATA.eventName}</Text>
-                            <View style={metaContainerStyle}>
-                                <Icon style={metaIconStyle} name='md-pin' />
-                                <Text style={metaTextStyle}>{DATA.locationDesc}</Text>
-                            </View>
-                            <View style={metaContainerStyle}>
-                                <Icon style={timeIconStyle} name='md-time' />
-                                <Text style={metaTextStyle}>{DATA.time}</Text>
-                            </View>
-                            <View style={metaContainerStyle}>
-                                <Icon style={metaIconStyle} name='ios-map' />
-                                <Text style={metaTextStyle}>{DATA.distance} away</Text>
-                            </View>
-                            <View style={metaContainerStyle}>
-                                <Icon style={metaIconStyle} name='ios-shirt' />
-                                <Text style={metaTextStyle}>{DATA.weather}</Text>
-                            </View>
-                        </View>
-                        <Text style={sectionTitleStyle}>About</Text>
-                        <View style={plainTextContainerStyle}>
-                            <Text style={plainTextStyle}>{DATA.eventDesc}</Text>
-                        </View>
-                        <Text style={sectionTitleStyle}>Location</Text>
-                        {this.renderMapLocation()}
-                    </View>
-                </ScrollView>
+            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                <Spinner color="#FF6F00" />
             </View>
         );
     }
+
+    render() {
+        console.ignoredYellowBox = ['Warning: View.propTypes'];
+        return (
+            <View style={{flex: 1}}>
+                {this.renderScreen()}
+            </View>
+        );
+    }
+
 }
 
 const styles = {
@@ -318,4 +336,8 @@ const styles = {
     }
 }
 
-export default Single;
+function mapStateToProps({ singleEvent }) {
+    return singleEvent;
+}
+
+export default connect(mapStateToProps, actions)(Single);
