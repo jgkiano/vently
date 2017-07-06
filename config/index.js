@@ -24,6 +24,9 @@ const config = {
     },
     getTicketsUrl() {
         return `${this.getPrefix()}/api/users/tickets`
+    },
+    getSingleTicketUrl(id) {
+        return `${this.getPrefix()}/api/tickets/${id}`
     }
 }
 

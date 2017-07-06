@@ -1,25 +1,19 @@
 import React, { Component } from 'react';
 import { View, Text, Platform, TouchableOpacity, Dimensions, Image, TouchableHighlight, Modal } from 'react-native';
-import { Icon, Button, Badge } from 'native-base';
+import { Icon, Button, Badge, Spinner } from 'native-base';
+import moment from 'moment';
 import { BackButton } from '../components';
 import QRCode from 'react-native-qrcode';
+
+import { connect } from 'react-redux';
+import * as actions from '../actions';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
-const DATA = {
-    id: 0,
-    eventName: "React Native Essential Training",
-    eventDate: "Wed, 27 July 8:00AM to 12:00PM",
-    eventLocation: "Strathmore University",
-    banner: "https://blog.algolia.com/wp-content/uploads/2015/12/react-native.png",
-    numberOfTickets: 1
-}
-
 class SingleTicket extends Component {
     state = {
         isCodeVisible: false,
-        modalVisible: false
     }
     static navigationOptions = ({ navigation }) => ({
         title: 'React Native Essential Training Ticket',
@@ -37,6 +31,24 @@ class SingleTicket extends Component {
         this.setState({modalVisible: visible});
     }
 
+    formatTime = () => {
+        if(this.props.data) {
+            const {
+                _dateFrom,
+                _dateTo
+            } =  this.props.data.eventId;
+            const dateFrom = moment(_dateFrom);
+            const dateTo = moment(_dateTo);
+            const diff = dateTo.diff(dateFrom,'days');
+            if (diff === 0) {
+                return `${moment(dateFrom).format('dddd')}, ${moment(dateFrom).format('MMM Do h:mm a')} - ${moment(dateTo).format('h:mm a')}`;
+            } else {
+                return `${moment(dateFrom).format('dddd')}, ${moment(dateFrom).format('MMM Do')} - ${moment(dateTo).format('dddd')}, ${moment(dateTo).format('MMM Do')}`;
+            }
+        }
+        return "";
+    }
+
     renderTicketInfo = () => {
         const {
             leftTicketCircleStyle,
@@ -49,13 +61,18 @@ class SingleTicket extends Component {
             qrContainer,
             backTextStyle
         } = styles;
+        const {
+            _id,
+            name,
+            locationDescription
+        } = this.props.data.eventId;
         if(this.state.isCodeVisible) {
             return (
                 <View style={qrContainer}>
                     <TouchableHighlight onPress={() => this.setState({isCodeVisible: false})}>
                         <View>
                             <QRCode
-                                value={DATA.id}
+                                value={_id}
                                 bgColor='#FF6F00'
                                 fgColor='white'
                             />
@@ -69,16 +86,16 @@ class SingleTicket extends Component {
             <View>
                 <View style={singleMetaContainerStyle}>
                     <Icon style={iconStyle} name="md-pricetag"></Icon>
-                    <Text style={metaTextStyle}>{DATA.numberOfTickets} Ticket</Text>
+                    <Text style={metaTextStyle}>{this.props.totalTickets} Ticket(s)</Text>
                 </View>
-                <Text style={{fontSize: 18, marginBottom: 12, marginTop: 12}}>{DATA.eventName}</Text>
+                <Text style={{fontSize: 18, marginBottom: 12, marginTop: 12}}>{name}</Text>
                 <View style={[singleMetaContainerStyle, {marginBottom: 8}]}>
                     <Icon style={iconStyle} name="md-calendar"></Icon>
-                    <Text style={[metaTextStyle]}>{DATA.eventDate}</Text>
+                    <Text style={[metaTextStyle]}>{this.formatTime()}</Text>
                 </View>
                 <View style={singleMetaContainerStyle}>
                     <Icon style={iconStyle} name="md-pin"></Icon>
-                    <Text style={metaTextStyle}>{DATA.eventLocation}</Text>
+                    <Text style={metaTextStyle}>{locationDescription}</Text>
                 </View>
                 <Button style={ buttonStyle } block warning onPress={() =>  this.setState({isCodeVisible: true})}>
                     <Text style={buttonTextStyle}>Generate Code</Text>
@@ -87,7 +104,7 @@ class SingleTicket extends Component {
         );
     };
 
-    render() {
+    renderScreen = () => {
         const {
             leftTicketCircleStyle,
             rightTicketCircleStyle,
@@ -100,18 +117,34 @@ class SingleTicket extends Component {
             ticketImageStyle,
             ticketInfoContainerStyle
         } = styles;
-        return (
+        if(!this.props.data) {
+            return(
+                <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                    <Spinner color="#FF6F00" />
+                </View>
+            );
+        }
+        const { banner } = this.props.data.eventId;
+        return(
             <View style={{flex: 1, width: SCREEN_WIDTH}}>
                 <View style={ticketContainerStyle}>
                     <View style={leftTicketCircleStyle} />
                     <View style={rightTicketCircleStyle} />
                     <View style={{flex:1}}>
-                        <Image resizeMode="cover" source={{uri: DATA.banner}} style={ticketImageStyle} />
+                        <Image resizeMode="cover" source={{uri: banner}} style={ticketImageStyle} />
                     </View>
                     <View style={ticketInfoContainerStyle}>
                         {this.renderTicketInfo()}
                     </View>
                 </View>
+            </View>
+        );
+    }
+
+    render() {
+        return (
+            <View style={{flex: 1}}>
+                {this.renderScreen()}
             </View>
         );
     }
@@ -205,4 +238,9 @@ const styles = {
     }
 }
 
-export default SingleTicket;
+
+function mapStateToProps({ singleTicket }) {
+    return singleTicket;
+}
+
+export default connect(mapStateToProps, actions)(SingleTicket);

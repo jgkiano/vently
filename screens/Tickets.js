@@ -57,15 +57,22 @@ class Tickets extends Component {
     };
 
     renderItem = (ticketInfo) => {
+        console.log(ticketInfo);
         if (Platform.OS ==='android') {
             return(
-                <TouchableNativeFeedback onPress={() => this.props.navigation.navigate('single')} useForeground>
+                <TouchableNativeFeedback onPress={() => this.props.goToSingleTicket({
+                    ticket: ticketInfo.singleTicketId,
+                    totalTickets: ticketInfo.totalTickets
+                }, this.props.token, this.props.navigation)} useForeground>
                     {this.singleItemView(ticketInfo)}
                 </TouchableNativeFeedback>
             );
         }
         return(
-            <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('single')}>
+            <TouchableWithoutFeedback onPress={() => this.props.goToSingleTicket({
+                ticket: ticketInfo.singleTicketId,
+                totalTickets: ticketInfo.totalTickets
+            }, this.props.token, this.props.navigation)} useForeground>
                 {this.singleItemView(ticketInfo)}
             </TouchableWithoutFeedback>
         );
