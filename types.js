@@ -14,3 +14,5 @@ export const NAVIGATE_SINGLE = 'navigate_single';
 export const GET_EVENT_INFO = 'get_event_info';
 export const TICKET_CHANGE = 'ticket_change';
 export const DEFAULT_TICKET_STATE = 'default_ticketState';
+
+export const GET_TICKETS = 'get_tickets';

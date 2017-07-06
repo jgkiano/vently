@@ -1,22 +1,11 @@
 import React, { Component } from 'react';
 import { View, Text, Platform, FlatList, TouchableNativeFeedback, TouchableWithoutFeedback } from 'react-native';
-import { Icon } from 'native-base';
+import { Icon, Spinner } from 'native-base';
 import { BackButton } from '../components';
+import moment from 'moment';
 
-const DATA = [
-    {
-        id: 0,
-        eventName: "React Native Essential Training",
-        time: "29th July, 8:00AM",
-        tickets: 1
-    },
-    {
-        id: 1,
-        eventName: "Burger Fest",
-        time: "30th July, 11:00AM",
-        tickets: 1
-    }
-];
+import { connect } from 'react-redux';
+import * as actions from '../actions';
 
 class Tickets extends Component {
 
@@ -30,9 +19,9 @@ class Tickets extends Component {
 
     singleItemView = (ticketInfo) => {
         const {
-            eventName,
-            time,
-            tickets
+            name,
+            dateFrom,
+            totalTickets
         } = ticketInfo;
         const {
             listContainerStyle,
@@ -48,15 +37,15 @@ class Tickets extends Component {
         return (
             <View style={listContainerStyle}>
                 <View style={leftListContainerStyle}>
-                    <Text style={eventTitleStyle}>{eventName}</Text>
+                    <Text style={eventTitleStyle}>{name}</Text>
                     <View style={eventMetaContainerStyle}>
                         <View style={singleMetaContainerStyle}>
                             <Icon style={iconStyle} name="md-calendar"></Icon>
-                            <Text style={metaTextStyle}>{time}</Text>
+                            <Text style={metaTextStyle}>{moment(dateFrom).format('MMMM Do YYYY, h:mm a')}</Text>
                         </View>
                         <View style={singleMetaContainerStyle}>
                             <Icon style={iconStyle} name="md-pricetag"></Icon>
-                            <Text style={metaTextStyle}>{tickets} ticket</Text>
+                            <Text style={metaTextStyle}>{totalTickets} ticket(s)</Text>
                         </View>
                     </View>
                 </View>
@@ -82,14 +71,33 @@ class Tickets extends Component {
         );
     }
 
+    renderScreen = () => {
+        if(this.props.token && !this.props.data) {
+            this.props.getTickets(this.props.token);
+        }
+        if(!this.props.data) {
+            return (
+                <View style={{flex: 1, justifyContent: 'center', alignItems:'center'}}>
+                    <Spinner color="#FF6F00" />
+                </View>
+            );
+        } else {
+            return (
+                <View style={{flex: 1}}>
+                    <FlatList
+                        data={this.props.data}
+                        renderItem={({item}) => this.renderItem(item)}
+                        keyExtractor={item => item.eventId}
+                    />
+                </View>
+            )
+        }
+    }
+
     render() {
         return (
             <View style={{flex: 1}}>
-            <FlatList
-                data={DATA}
-                renderItem={({item}) => this.renderItem(item)}
-                keyExtractor={item => item.id}
-            />
+                {this.renderScreen()}
             </View>
         );
     }
@@ -144,4 +152,8 @@ const styles = {
     }
 }
 
-export default Tickets;
+function mapStateToProps({ tickets }) {
+    return tickets;
+}
+
+export default connect(mapStateToProps, actions)(Tickets);

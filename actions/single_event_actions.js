@@ -45,7 +45,7 @@ export const ticketCalculator = (op, tickets, ticketPrice) => {
 }
 
 export const placeOrder = (order, navigation) => {
-    
+
 }
 
 _getLocationAsync = async () => {
@@ -69,6 +69,6 @@ _getEventDetailes = async (url, token) => {
         });
         return data.event;
     } catch (error) {
-
+        //handle error
     }
 }

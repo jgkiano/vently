@@ -21,6 +21,9 @@ const config = {
     },
     getSingleEventUrl(id, coords = null) {
         return ( coords ) ? `${this.getPrefix()}/api/events/${id}?lat=${coords.latitude}&lng=${coords.longitude}` : `${this.getPrefix()}/api/events/${id}`;
+    },
+    getTicketsUrl() {
+        return `${this.getPrefix()}/api/users/tickets`
     }
 }
 

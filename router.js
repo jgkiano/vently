@@ -34,7 +34,6 @@ const MainNavigator = TabNavigator({
 
     mainApp: { screen: TabNavigator({
 
-
         feed: { screen: StackNavigator({
 
             feed: { screen: EventFeedScreen, navigationOptions: {
