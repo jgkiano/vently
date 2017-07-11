@@ -30,6 +30,12 @@ const config = {
     },
     getTicketShareUrl() {
         return `${this.getPrefix()}/api/tickets/`
+    },
+    getPlaceOrderUrl() {
+        return `${this.getPrefix()}/api/pay`
+    },
+    getProfileUrl() {
+        return `${this.getPrefix()}/api/users`
     }
 }
 

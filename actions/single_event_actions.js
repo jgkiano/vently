@@ -5,7 +5,8 @@ import axios from 'axios';
 import {
     GET_EVENT_INFO,
     TICKET_CHANGE,
-    DEFAULT_TICKET_STATE
+    DEFAULT_TICKET_STATE,
+    PAYMENT_IFRAME
 } from '../types';
 
 import config from '../config';
@@ -44,8 +45,31 @@ export const ticketCalculator = (op, tickets, ticketPrice) => {
     return { type: DEFAULT_TICKET_STATE };
 }
 
-export const placeOrder = (order, navigation) => {
+export const placeOrder = (order, navigation) => async (dispatch) => {
+    navigation.navigate('pay');
+    if(order.user) {
+        const data = await _placeOrder(order);
+        dispatch({
+            type: PAYMENT_IFRAME,
+            payload: {
+                iframe: data.iframe,
+                token: order.user
+            }
+        });
+    }
+}
 
+_placeOrder = async (order) => {
+    console.log('called');
+    try {
+        const query = { tickets: order.tickets, total: order.total, eventId: order.eventId };
+        const requestConfig = { headers: { Authorization: order.user } };
+        const { data } = await axios.post(config.getPlaceOrderUrl(), query , requestConfig);
+        return data;
+    } catch (error) {
+        //handle error
+        console.log(error);
+    }
 }
 
 _getLocationAsync = async () => {

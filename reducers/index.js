@@ -5,6 +5,8 @@ import events from './events_reducer';
 import singleEvent from './single_event_reducer';
 import tickets from './tickets_reducer';
 import singleTicket from './single_ticket_reducer';
+import pay from './pay_reducer';
+import profile from './profile_reducer';
 
 export default combineReducers({
     auth,
@@ -12,5 +14,7 @@ export default combineReducers({
     events,
     singleEvent,
     tickets,
-    singleTicket
+    singleTicket,
+    pay,
+    profile
 });

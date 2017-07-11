@@ -9,6 +9,9 @@ class BackButton extends Component {
         }
         return <Icon style={{color:'white', marginLeft: 15}} name = 'md-arrow-back'/>
     }
+    componentWillUnmount() {
+        console.log('UNMOUNTED');
+    }
     render() {
         const { back } = this.props;
         return (

@@ -1,24 +1,19 @@
 import React, { Component } from 'react';
-import { View, Text, Image, ScrollView,TouchableOpacity } from 'react-native';
-import { Icon, Item, Label, Input, Picker, Button } from 'native-base';
+import { View, Text, Image, ScrollView,TouchableOpacity, KeyboardAvoidingView } from 'react-native';
+import { Icon, Item, Label, Input, Picker, Button, Spinner } from 'native-base';
 import { ImagePicker } from 'expo';
+
+import { connect } from 'react-redux';
+import * as actions from '../actions';
 
 const DATA = {
     image: "https://static1.squarespace.com/static/52e118c6e4b0c14b4f88dcec/53ea6b48e4b0b68b61945a97/53ea6b72e4b094ab1e4e0c64/1412855342795/Jack+Sparrow-19.jpg",
-    firstname: 'Jack',
-    lastname: 'Sparrow',
-    phone: '0712345678',
-    email: 'jacksparrow@gmail.com'
 }
 
 class Profile extends Component {
     state = {
         editMode: true,
         image: DATA.image,
-        firstname: DATA.firstname,
-        lastname: DATA.lastname,
-        phone: DATA.phone,
-        email: DATA.email,
     }
 
     static navigationOptions = ({ navigation }) => ({
@@ -52,7 +47,7 @@ class Profile extends Component {
         }
     }
 
-    render() {
+    renderScreen = () => {
         const {
             containerStyle,
             buttonStyle,
@@ -70,51 +65,73 @@ class Profile extends Component {
             imageContainerStyle,
             imageStyle
         } = styles;
-        return (
-            <View style={containerStyle}>
-                <View style={heroContainerStyle}>
-                    <TouchableOpacity style={editButtonContainerStyle} onPress={() => this.setState({editMode: this.state.editMode ? false : true})}>
-                        <Icon style={editButtonStyle} name="md-create" />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => this.pickImage()} style={imageContainerStyle}>
-                        <Image source={{uri: this.state.image}} resizeMode="cover" style={imageStyle} />
-                    </TouchableOpacity>
+        if(this.props.data) {
+            return(
+                <KeyboardAvoidingView style={{flex: 1}} behavior="padding">
+                <View style={containerStyle}>
+                    <View style={heroContainerStyle}>
+                        <TouchableOpacity style={editButtonContainerStyle} onPress={() => this.setState({editMode: this.state.editMode ? false : true})}>
+                            <Icon style={editButtonStyle} name="md-create" />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => this.pickImage()} style={imageContainerStyle}>
+                            <Image source={{uri: this.state.image}} resizeMode="cover" style={imageStyle} />
+                        </TouchableOpacity>
+                    </View>
+                    <ScrollView style={containerStyle}>
+                        <View style={ formContainerStyle }>
+                            <View style={ inputRowContainerStyle }>
+                                <View style={itemRowContainerStyle}>
+                                    <Item stackedLabel>
+                                        <Label style={labelStyle}>FIRST NAME*</Label>
+                                        <Input style={this.renderInputStyle()} onChangeText={(text) => this.props.changeFirstName(text)} disabled={this.state.editMode} value={this.props.data.firstname} />
+                                    </Item>
+                                </View>
+                                <View style={ itemRowContainerStyle }>
+                                    <Item stackedLabel>
+                                        <Label style={labelStyle}>LAST NAME*</Label>
+                                        <Input style={this.renderInputStyle()} onChangeText={(text) => this.props.changeLastName(text)} disabled={this.state.editMode} value={this.props.data.lastname} />
+                                    </Item>
+                                </View>
+                            </View>
+                            <View style={inputContainerStyle}>
+                                <Item stackedLabel>
+                                    <Label style={labelStyle}>EMAIL ADDRESS*</Label>
+                                    <Input keyboardType="email-address" style={this.renderInputStyle()} onChangeText={(text) => this.props.changeEmail(text)} disabled={this.state.editMode} value={this.props.data.email} />
+                                </Item>
+                            </View>
+
+                            <View style={ inputRowContainerStyle }>
+                                <View style={ itemRowContainerStyle }>
+                                    <Item stackedLabel>
+                                        <Label style={labelStyle}>PHONE*</Label>
+                                        <Input keyboardType="phone-pad" style={this.renderInputStyle()} onChangeText={(text) => this.props.changePhone(text)} disabled={this.state.editMode} value={this.props.data.phone.toString()} />
+                                    </Item>
+                                </View>
+                            </View>
+
+                            <Button onPress={() => this.props.saveUser(this.props.data, this.props.token)} style={ buttonStyle } block warning>
+                                <Text style={buttonTextStyle}>Update Profile</Text>
+                            </Button>
+                        </View>
+                    </ScrollView>
                 </View>
-                <ScrollView style={containerStyle}>
-                <View style={ formContainerStyle }>
-                    <View style={ inputRowContainerStyle }>
-                        <View style={itemRowContainerStyle}>
-                            <Item stackedLabel>
-                                <Label style={labelStyle}>FIRST NAME*</Label>
-                                <Input style={this.renderInputStyle()} onChangeText={(text) => this.setState({firstname: text})} disabled={this.state.editMode} value={this.state.firstname} />
-                            </Item>
-                        </View>
-                        <View style={ itemRowContainerStyle }>
-                            <Item stackedLabel>
-                                <Label style={labelStyle}>LAST NAME*</Label>
-                                <Input style={this.renderInputStyle()} onChangeText={(text) => this.setState({lastname: text})} disabled={this.state.editMode} value={this.state.lastname} />
-                            </Item>
-                        </View>
-                    </View>
-                    <View style={inputContainerStyle}>
-                        <Item stackedLabel>
-                            <Label style={labelStyle}>EMAIL ADDRESS*</Label>
-                            <Input style={this.renderInputStyle()} onChangeText={(text) => this.setState({email: text})} disabled={this.state.editMode} value={this.state.email} />
-                        </Item>
-                    </View>
-                    <View style={ inputRowContainerStyle }>
-                        <View style={ itemRowContainerStyle }>
-                            <Item stackedLabel>
-                                <Label style={labelStyle}>PHONE*</Label>
-                                <Input style={this.renderInputStyle()} onChangeText={(text) => this.setState({phone: text})} disabled={this.state.editMode} value={this.state.phone} />
-                            </Item>
-                        </View>
-                    </View>
-                    <Button style={ buttonStyle } block warning>
-                        <Text style={buttonTextStyle}>Update Profile</Text>
-                    </Button>
-                </View>
-                </ScrollView>
+                </KeyboardAvoidingView>
+            );
+        }
+        if(this.props.token && !this.props.data) {
+            this.props.getProfile(this.props.token);
+        }
+        return(
+            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#E9E9EF'}}>
+                <Spinner color="#FF6F00" />
+            </View>
+        );
+    }
+
+    render() {
+        return(
+            <View style={{flex: 1}}>
+                {this.renderScreen()}
             </View>
         );
     }
@@ -185,4 +202,8 @@ const styles = {
     },
 }
 
-export default Profile;
+function mapStateToProps({ profile }) {
+    return profile;
+}
+
+export default connect(mapStateToProps, actions)(Profile);

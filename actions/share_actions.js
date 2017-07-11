@@ -20,14 +20,6 @@ export const shareTicket = (shareInfo, navigation, token) => async (dispatch) =>
                 type: GET_TICKETS,
                 payload: remainingTickets
             });
-            Alert.alert(
-                'Ticket shared successfully!',
-                'Sharing is ventling! You have successfully shared you ticket. What will your next adventure be?',
-                [
-                    {text: 'Go Back', onPress: () => goBackToListing(navigation)},
-                ],
-                { cancelable: true }
-            );
         }
     } else {
         handleBadNumber(navigation);
@@ -42,6 +34,7 @@ _shareTicket = async (shareInfo, navigation, token) => {
         console.log(response.data);
         if (response.data.success) {
             const { data } = await axios.get(config.getTicketsUrl(), requestConfig);
+            handleShareSuccessful(navigation);
             return data.data;
         }
     } catch (error) {
@@ -62,6 +55,17 @@ _shareTicket = async (shareInfo, navigation, token) => {
             //network error
         }
     }
+}
+
+handleShareSuccessful = (navigation) => {
+    Alert.alert(
+        'Ticket shared successfully!',
+        'Sharing is ventling! You have successfully shared you ticket. What will your next adventure be?',
+        [
+            {text: 'Go Back', onPress: () => goBackToListing(navigation)},
+        ],
+        { cancelable: true }
+    );
 }
 
 handleBadNumber = (navigation) => {

@@ -20,3 +20,11 @@ export const GET_TICKETS = 'get_tickets';
 export const GET_SINGLE_TICKET = 'get_single_ticket';
 
 export const SHARE_TICKET = 'share_ticket';
+
+export const PAYMENT_IFRAME = 'payment_iframe';
+
+export const GET_PROFILE = 'get_profile';
+export const FIRST_NAME_CHANGE = 'first_name_change';
+export const LAST_NAME_CHANGE = 'last_name_change';
+export const EMAIL_CHANGE = 'email_change';
+export const PHONE_CHANGE = 'phone_change';

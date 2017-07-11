@@ -9,6 +9,10 @@ import * as actions from '../actions';
 
 class Tickets extends Component {
 
+    state = {
+        refreshing: false
+    }
+
     static navigationOptions = ({ navigation }) => ({
         title: 'Tickets',
         headerTitle: <Text style={styles.titleStyle}>TICKETS</Text>,
@@ -77,6 +81,10 @@ class Tickets extends Component {
         );
     }
 
+    handleRefresh = () => {
+        this.props.getTickets(this.props.token);
+    }
+
     renderScreen = () => {
         if(this.props.token && !this.props.data) {
             this.props.getTickets(this.props.token);
@@ -94,7 +102,13 @@ class Tickets extends Component {
                         data={this.props.data}
                         renderItem={({item}) => this.renderItem(item)}
                         keyExtractor={item => item.eventId}
+                        refreshing={this.state.refreshing}
+                        onRefresh = {this.handleRefresh}
                     />
+                    <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+                    <Text style={{textAlign: 'center', fontWeight:'bold', opacity: 0.5}}>Pull down to refresh</Text>
+                        <Icon name="md-arrow-round-down" style={{opacity: 0.5, marginLeft: 15}} />
+                    </View>
                 </View>
             )
         }

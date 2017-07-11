@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import { View, Text, WebView, Dimensions } from 'react-native';
-import { Icon, Spinner } from 'native-base';
+import { Icon, Spinner, Button } from 'native-base';
 import { BackButton } from '../components';
+
+import { connect } from 'react-redux';
+import * as actions from '../actions';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -13,23 +16,44 @@ class Pay extends Component {
         webLoaded: false
     };
 
-    static navigationOptions = ({ navigation }) => ({
-        title: 'Payment',
-        headerTitle: <Text style={styles.titleStyle}>Payment</Text>,
-        tabBarIcon: ({ tintColor }) => {
-            return <Icon style={{ color: tintColor }} name = 'ios-home' />;
-        },
-        headerLeft: <BackButton back={navigation.goBack}/>
-    });
+    // static navigationOptions = ({ navigation }) => ({
+    //     title: 'Payment',
+    //     headerTitle: <Text style={styles.titleStyle}>Payment</Text>,
+    //     tabBarIcon: ({ tintColor }) => {
+    //         return <Icon style={{ color: tintColor }} name = 'ios-home' />;
+    //     },
+    //     headerLeft: <BackButton back={navigation.goBack}/>
+    // });
+
+    static navigationOptions = ({ navigation }) => {
+        const { params = {} } = navigation.state;
+        return {
+            title: 'Payment',
+            headerTitle: <Text style={styles.titleStyle}>Payment</Text>,
+            tabBarIcon: ({ tintColor }) => {
+                return <Icon style={{ color: tintColor }} name = 'ios-home' />;
+            },
+            headerLeft: <BackButton onUnMount="getTickets" back={navigation.goBack}/>,
+        };
+    };
+
+    renderScreen = () => {
+        if(this.props.iframe) {
+            return(
+                <WebView style={{flex: 1, width: SCREEN_WIDTH}} source={{html: this.props.iframe }} />
+            );
+        }
+        return(
+            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                <Spinner color="#FF6F00" />
+            </View>
+        );
+    }
 
     render() {
         return (
             <View style={{flex:1, backgroundColor:'white'}}>
-                {(this.state.webLoaded) ? null : <Spinner style={{backgroundColor: 'transparent'}} color="#FF6F00" />}
-                <WebView
-                    source={{uri: PAY_URL}}
-                    onLoadEnd={() => this.setState({webLoaded: true})}
-                />
+                {this.renderScreen()}
             </View>
         );
     }
@@ -44,4 +68,8 @@ const styles = {
     },
 }
 
-export default Pay;
+function mapStateToProps({ pay }) {
+    return pay;
+}
+
+export default connect(mapStateToProps, actions)(Pay);
