@@ -11,3 +11,5 @@ export * from './ticket_actions';
 export * from './share_actions';
 
 export * from './profile_actions';
+
+export * from './map_actions';

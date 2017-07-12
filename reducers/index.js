@@ -7,6 +7,8 @@ import tickets from './tickets_reducer';
 import singleTicket from './single_ticket_reducer';
 import pay from './pay_reducer';
 import profile from './profile_reducer';
+import map from './map_reducer';
+
 
 export default combineReducers({
     auth,
@@ -16,5 +18,6 @@ export default combineReducers({
     tickets,
     singleTicket,
     pay,
-    profile
+    profile,
+    map
 });

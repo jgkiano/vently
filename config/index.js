@@ -36,6 +36,9 @@ const config = {
     },
     getProfileUrl() {
         return `${this.getPrefix()}/api/users`
+    },
+    getEventsNearMeUrl(coords) {
+        return `${this.getPrefix()}/api/events?lat=${coords.latitude}&lng=${coords.longitude}`;
     }
 }
 

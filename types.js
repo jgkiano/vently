@@ -28,3 +28,5 @@ export const FIRST_NAME_CHANGE = 'first_name_change';
 export const LAST_NAME_CHANGE = 'last_name_change';
 export const EMAIL_CHANGE = 'email_change';
 export const PHONE_CHANGE = 'phone_change';
+
+export const EVENTS_NEAR_LOCATION = 'events_near_location';
