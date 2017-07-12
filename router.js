@@ -36,7 +36,7 @@ const MainNavigator = TabNavigator({
 
         feed: { screen: StackNavigator({
 
-            feed: { screen: EventFeedScreen, navigationOptions: {
+            eventFeed: { screen: EventFeedScreen, navigationOptions: {
                 headerStyle: {
                     backgroundColor: '#FF6F00',
                 },
@@ -114,11 +114,7 @@ const MainNavigator = TabNavigator({
         tabBarPosition: 'bottom',
         swipeEnabled: true,
         animationEnabled: true,
-
-})},
-
-
-
+    })},
 
 }, {
     navigationOptions: {
