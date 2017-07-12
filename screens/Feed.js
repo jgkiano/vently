@@ -18,6 +18,7 @@ class Feed extends Component {
         headerRight: <TouchableOpacity
             onPress={() => {navigation.navigate('map')}}
             ><Icon style={styles.mapIconStyle} name='md-map' /></TouchableOpacity>,
+        headerLeft: <View />,
         tabBarIcon: ({ tintColor }) => {
             return <Icon style={{ color: tintColor }} name = 'ios-home' />;
         }

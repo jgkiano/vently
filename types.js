@@ -30,3 +30,5 @@ export const EMAIL_CHANGE = 'email_change';
 export const PHONE_CHANGE = 'phone_change';
 
 export const EVENTS_NEAR_LOCATION = 'events_near_location';
+
+export const GET_INTERESTS = 'get_interests';

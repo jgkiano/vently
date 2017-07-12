@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 import { View, Text, Alert, TouchableOpacity, Dimensions, ScrollView, Image, LayoutAnimation, UIManager } from 'react-native';
 import { Button, Spinner } from 'native-base';
-import axios from 'axios';
+
+import { connect } from 'react-redux';
+import * as actions from '../actions';
+
 import config from '../config';
 
 //get screen width
 const SCREEN_WIDTH = Dimensions.get('window').width;
-
-const INTERESTURL = config.getInterestsUrl();
-const USERSINTERESTUPDATEURL = config.getInterestsUpdateUrl();
 
 class Interests extends Component {
     //default component level state
@@ -24,56 +24,11 @@ class Interests extends Component {
         //poor android
         UIManager.setLayoutAnimationEnabledExperimental &&
         UIManager.setLayoutAnimationEnabledExperimental(true);
-        this.getInterests();
     }
 
     //nice spring animation
     componentWillUpdate() {
         LayoutAnimation.spring();
-    }
-
-    getInterests = async () => {
-        try {
-            const {data} = await axios.get(INTERESTURL);
-            this.setState({ data: data.interests, loading: false });
-        } catch (error) {
-            // Alert.alert(
-            //     'Could not connected to vently',
-            //     'We\'re having a bit of trouble accessing our servers. check your internet connection and try again',
-            //     [
-            //         {text: 'Cancel', onPress: () => console.log('canceled') , style: 'cancel'},
-            //         {text: 'Try Again', onPress: () => this.getInterests()},
-            //     ],
-            //     { cancelable: true }
-            // );
-        }
-    }
-
-    saveInterests = async () => {
-        const { state } = this.props.navigation;
-        const token = state.params.token;
-        this.setState({saving: true});
-        try {
-            const { data } = await axios.put(
-                USERSINTERESTUPDATEURL,
-                { interests: this.state.interests },
-                {
-                    headers: { Authorization: token }
-                }
-            );
-            this.props.navigation.navigate('mainApp');
-        } catch (error) {
-            this.setState({saving: false});
-            Alert.alert(
-                'Could not connected to vently',
-                'We\'re having a bit of trouble accessing our servers. check your internet connection and try again',
-                [
-                    {text: 'Cancel', onPress: () => console.log('canceled') , style: 'cancel'},
-                    {text: 'Try Again', onPress: () => this.saveInterests()},
-                ],
-                { cancelable: true }
-            );
-        }
     }
 
     //determine progress as user taps
@@ -111,7 +66,7 @@ class Interests extends Component {
             interestIconStyle,
             interestTextStyle
         } = styles;
-        return this.state.data.map((interest) => {
+        return this.props.data.map((interest) => {
             return (
                 <TouchableOpacity onPress={() => {this.renderProgress(interest._id)}} key={interest._id}>
                     <View style={ interestGridStyle }>
@@ -127,18 +82,22 @@ class Interests extends Component {
 
     renderBottomSection = () => {
         const {scrollContainerStyle, scrollViewStyle } = styles;
-        if(this.state.loading) {
+        if(this.props.data) {
             return(
-                <View style={{flex: 2, backgroundColor:'#eeeeee', justifyContent: 'center', alignItems: 'center'}}>
-                    <Spinner color="#FF6F00" />
+                <View style={ scrollContainerStyle }>
+                    <ScrollView contentContainerStyle={ scrollViewStyle }>
+                        {this.renderInterests()}
+                    </ScrollView>
                 </View>
             );
         }
-        return (
-            <View style={ scrollContainerStyle }>
-                <ScrollView contentContainerStyle={ scrollViewStyle }>
-                    {this.renderInterests()}
-                </ScrollView>
+        if(this.props.token && !this.props.data) {
+            console.log(this.props.token);
+            this.props.getInterests();
+        }
+        return(
+            <View style={{flex: 2, backgroundColor:'#eeeeee', justifyContent: 'center', alignItems: 'center'}}>
+                <Spinner color="#FF6F00" />
             </View>
         );
     }
@@ -159,7 +118,7 @@ class Interests extends Component {
         if( this.state.interests.length >= 5) {
             return(
                 <View style={ buttonStyleContainer }>
-                    <Button onPress={() => this.saveInterests() } style={ buttonStyle }>
+                    <Button onPress={() => this.props.saveInterests(this.state.interests, this.props.token, this.props.navigation) } style={ buttonStyle }>
                         {this.renderButtonContent()}
                     </Button>
                 </View>
@@ -281,4 +240,8 @@ const styles = {
     }
 }
 
-export default Interests;
+function mapStateToProps({ interests }) {
+    return interests;
+}
+
+export default connect(mapStateToProps, actions)(Interests);

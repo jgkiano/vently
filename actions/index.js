@@ -17,3 +17,5 @@ export * from './map_actions';
 export * from './settings_actions';
 
 export * from './register_actions';
+
+export * from './interests_action';

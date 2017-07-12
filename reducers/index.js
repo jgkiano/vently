@@ -8,6 +8,7 @@ import singleTicket from './single_ticket_reducer';
 import pay from './pay_reducer';
 import profile from './profile_reducer';
 import map from './map_reducer';
+import interests from './interests_reducer';
 
 
 export default combineReducers({
@@ -19,5 +20,6 @@ export default combineReducers({
     singleTicket,
     pay,
     profile,
-    map
+    map,
+    interests
 });
