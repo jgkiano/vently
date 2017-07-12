@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import { View, Text, Platform } from 'react-native';
 import { Icon, Button } from 'native-base';
 
+import { connect } from 'react-redux';
+import * as actions from '../actions';
+
 class Settings extends Component {
 
     static navigationOptions = ({ navigation }) => ({
@@ -24,7 +27,7 @@ class Settings extends Component {
                     <Icon name="md-clipboard" />
                     <Text style={buttonTextStyle}>SELECT YOUR INTERESTS</Text>
                 </Button>
-                <Button style={ buttonStyleRed } block warning>
+                <Button onPress={() => this.props.logOut(this.props.navigation)} style={ buttonStyleRed } block warning>
                     <Icon name="md-exit" />
                     <Text style={buttonTextStyle}>LOG OUT</Text>
                 </Button>
@@ -55,4 +58,8 @@ const styles = {
     },
 }
 
-export default Settings;
+function mapStateToProps({settings}) {
+    return settings;
+}
+
+export default connect(null, actions)(Settings);

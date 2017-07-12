@@ -13,3 +13,7 @@ export * from './share_actions';
 export * from './profile_actions';
 
 export * from './map_actions';
+
+export * from './settings_actions';
+
+export * from './register_actions';

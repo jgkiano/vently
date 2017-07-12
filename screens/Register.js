@@ -2,22 +2,38 @@ import React, { Component } from 'react';
 import { View, Text, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
 import { Item, Input, Label, Button, Picker } from 'native-base';
 
+import { connect } from 'react-redux';
+import * as actions from '../actions';
+
 class Register extends Component {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            selectedItem: undefined,
-            selected1: 'key0',
-            results: {
-                items: []
-            }
-        }
+    state = {
+        firstname:"",
+        lastname:"",
+        phone:"",
+        password:"",
+        email:"",
+        confirmPass:"",
+        gender: 'male',
     }
+
     onValueChange (value: string) {
+        console.log(value);
         this.setState({
-            selected1 : value
+            gender : value
         });
+    }
+
+    handleRegistration = () => {
+        const user = {
+            firstname: this.state.firstname,
+            lastname: this.state.lastname,
+            email: this.state.email,
+            phone: this.state.phone,
+            password: this.state.password,
+            gender: this.state.gender
+        }
+        this.props.registerUser(user, this.props.navigation);
     }
 
     render() {
@@ -44,27 +60,27 @@ class Register extends Component {
                         <View style={itemRowContainerStyle}>
                             <Item floatingLabel>
                                 <Label style={labelStyle}>FIRST NAME*</Label>
-                                <Input />
+                                <Input autoCorrect={false} autoCapitalize="words" value={this.state.firstname} onChangeText={firstname => this.setState({firstname})} />
                             </Item>
                         </View>
                         <View style={ itemRowContainerStyle }>
                             <Item floatingLabel>
                                 <Label style={labelStyle}>LAST NAME*</Label>
-                                <Input />
+                                <Input autoCorrect={false} autoCapitalize="words" value={this.state.lastname} onChangeText={lastname => this.setState({lastname})} />
                             </Item>
                         </View>
                     </View>
                     <View style={inputContainerStyle}>
                         <Item floatingLabel>
                             <Label style={labelStyle}>EMAIL ADDRESS*</Label>
-                            <Input />
+                            <Input autoCorrect={false} autoCapitalize="none" keyboardType="email-address" value={this.state.email} onChangeText={email => this.setState({email})} />
                         </Item>
                     </View>
                     <View style={ inputRowContainerStyle }>
                         <View style={ itemRowContainerStyle }>
                             <Item floatingLabel>
                                 <Label style={labelStyle}>PHONE*</Label>
-                                <Input />
+                                <Input autoCorrect={false} keyboardType="phone-pad" value={this.state.phone} onChangeText={phone => this.setState({phone})} />
                             </Item>
                         </View>
                         <View style={ pickerContainerStyle }>
@@ -72,27 +88,27 @@ class Register extends Component {
                                 supportedOrientations={['portrait','landscape']}
                                 iosHeader="Select Gender"
                                 mode="dropdown"
-                                selectedValue={this.state.selected1}
+                                selectedValue={this.state.gender}
                                 onValueChange={this.onValueChange.bind(this)}
                             >
-                                <Item label="Male" value="key0" />
-                                <Item label="Female" value="key1" />
+                                <Item label="Male" value="male" />
+                                <Item label="Female" value="female" />
                             </Picker>
                         </View>
                     </View>
                     <View style={ inputContainerStyle }>
                         <Item floatingLabel>
                             <Label style={labelStyle}>PASSWORD*</Label>
-                            <Input />
+                            <Input secureTextEntry autoCorrect={false} value={this.state.password} onChangeText={password => this.setState({password})} />
                         </Item>
                     </View>
                     <View style={ inputContainerStyle }>
                         <Item floatingLabel>
                             <Label style={labelStyle}>CONFIRM PASSWORD*</Label>
-                            <Input />
+                            <Input secureTextEntry autoCorrect={false} value={this.state.confirmPass} onChangeText={confirmPass => this.setState({confirmPass})} />
                         </Item>
                     </View>
-                    <Button style={ buttonStyle } block warning onPress={() => this.props.navigation.navigate('interests') }>
+                    <Button style={ buttonStyle } block warning onPress={() => this.handleRegistration() }>
                         <Text style={buttonTextStyle}>Sign Up</Text>
                     </Button>
                     <TouchableOpacity>
@@ -148,4 +164,8 @@ const styles = {
 
 
 
-export default Register;
+function mapStateToProps({auth}) {
+    return auth;
+}
+
+export default connect(null, actions)(Register);

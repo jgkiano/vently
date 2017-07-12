@@ -58,6 +58,7 @@ export const loginUser = (email, password, navigation) => async (dispatch) => {
         await AsyncStorage.setItem('token', token);
         navigation.navigate('mainApp');
         dispatch({ type: RECEIVE_TOKEN, payload: { token }});
+        dispatch({ type: LOADING_STATUS, payload: { loading: false}});
         return;
     } catch (error) {
         if(error.response) {
